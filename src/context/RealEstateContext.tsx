@@ -68,14 +68,24 @@ export function RealEstateProvider({ children }: { children: React.ReactNode }) 
 
   // Load favorites from localStorage on mount
   useEffect(() => {
-    try {
-      const savedFavs = localStorage.getItem('prime_favorites');
-      if (savedFavs) {
-        setFavorites(JSON.parse(savedFavs));
+    let cancelled = false;
+
+    function loadFavorites() {
+      try {
+        const savedFavs = localStorage.getItem('prime_favorites');
+        if (savedFavs && !cancelled) {
+          setFavorites(JSON.parse(savedFavs));
+        }
+      } catch (e) {
+        if (!cancelled) console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
+
+    loadFavorites();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {

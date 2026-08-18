@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Navigation, Building2, Bed, Bath, Maximize,
@@ -43,7 +43,8 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchCity, setSearchCity] = useState('São Paulo');
 
-  const [properties, setProperties] = useState<MapPropertyItem[]>([]);
+  const [localProperties, setLocalProperties] = useState<MapPropertyItem[]>([]);
+  const properties = propsFromParent && propsFromParent.length > 0 ? propsFromParent : localProperties;
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -52,21 +53,28 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
 
   useEffect(() => {
     if (propsFromParent && propsFromParent.length > 0) {
-      setProperties(propsFromParent);
       return;
     }
+
+    let cancelled = false;
+
     async function fetchProps() {
       try {
         const res = await fetch('/api/properties');
         const data = await res.json();
-        if (data.success && data.data) {
-          setProperties(data.data);
+        if (data.success && data.data && !cancelled) {
+          setLocalProperties(data.data);
         }
       } catch (e) {
-        console.error('Map props fetch error:', e);
+        if (!cancelled) console.error('Map props fetch error:', e);
       }
     }
+
     fetchProps();
+
+    return () => {
+      cancelled = true;
+    };
   }, [propsFromParent]);
 
   const detectUserLocation = () => {
@@ -84,74 +92,115 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     }
   };
 
-  const filteredProperties = properties.filter(p => {
+  const filteredProperties = useMemo(() => properties.filter(p => {
     const matchType = filterType ? (p.type === filterType || p.type === 'ambos') : true;
     const matchCategory = filterCategory ? p.category === filterCategory : true;
     const matchMapFilter = mapFilter === 'todos' ? true : (mapFilter === 'terreno' ? p.category === 'terreno' : (p.type === mapFilter || p.type === 'ambos'));
     const matchMapCat = mapCategory === 'todos' ? true : p.category === mapCategory;
     return matchType && matchCategory && matchMapFilter && matchMapCat;
-  });
+  }), [properties, filterCategory, filterType, mapFilter, mapCategory]);
 
   const availableCities = Array.from(new Set(properties.map(p => p.city))).sort();
 
-  const getValidCoords = () => {
+  const getValidCoords = useCallback(() => {
     const valid = filteredProperties.filter(p => p.latitude != null && p.longitude != null && !isNaN(Number(p.latitude)) && !isNaN(Number(p.longitude)));
     if (valid.length > 0) return valid;
     return filteredProperties;
-  };
-
-  const initMap = () => {
-    if (typeof window === 'undefined' || !mapRef.current || leafletLoadedRef.current) return;
-
-    import('leaflet').then((L) => {
-      import('leaflet/dist/leaflet.css');
-
-      leafletModuleRef.current = L.default;
-
-      const defaultIcon = (L.default as any).icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
-
-      (L.default as any).Marker.prototype.options.icon = defaultIcon;
-
-      const validCoords = getValidCoords();
-      const center: [number, number] = validCoords.length > 0
-        ? [Number(validCoords[0].latitude), Number(validCoords[0].longitude)]
-        : (userLocation ? [userLocation.lat, userLocation.lng] : [-23.5505, -46.6333]);
-
-      const map = (L.default).map(mapRef.current!).setView(center, 13);
-
-      (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 20,
-      }).addTo(map);
-
-      markersRef.current = validCoords.map((prop) => {
-        const marker = (L.default).marker([Number(prop.latitude), Number(prop.longitude)] as [number, number])
-          .addTo(map)
-          .on('click', () => setSelectedProp(prop));
-        return marker;
-      });
-
-      if (validCoords.length > 1) {
-        const group = new (L.default as any).featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15));
-      }
-
-      mapInstanceRef.current = map;
-      leafletLoadedRef.current = true;
-    });
-  };
+  }, [filteredProperties]);
 
   useEffect(() => {
-    initMap();
-  }, [filteredProperties, userLocation]);
+    if (typeof window === 'undefined' || !mapRef.current) return;
+
+    let cancelled = false;
+
+    const container = mapRef.current;
+
+    const waitForContainer = () => new Promise<void>((resolve) => {
+      const check = () => {
+        const rect = container.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          resolve();
+        } else {
+          requestAnimationFrame(check);
+        }
+      };
+      check();
+    });
+
+    waitForContainer().then(() => {
+      if (cancelled) return;
+      if ((container as any)._leaflet_id) return;
+
+      import('leaflet').then((L) => {
+        if (cancelled) return;
+        if ((container as any)._leaflet_id) return;
+
+        import('leaflet/dist/leaflet.css');
+
+        leafletModuleRef.current = L.default;
+
+        const defaultIcon = (L.default as any).icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        });
+
+        (L.default as any).Marker.prototype.options.icon = defaultIcon;
+
+        const validCoords = getValidCoords();
+        const center: [number, number] = validCoords.length > 0
+          ? [Number(validCoords[0].latitude), Number(validCoords[0].longitude)]
+          : (userLocation ? [userLocation.lat, userLocation.lng] : [-23.5505, -46.6333]);
+
+        const map = (L.default).map(container).setView(center, 13);
+
+        (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 20,
+        }).addTo(map);
+
+        setTimeout(() => {
+          if (cancelled) return;
+          map.invalidateSize();
+
+          markersRef.current = validCoords.map((prop) => {
+            const marker = (L.default).marker([Number(prop.latitude), Number(prop.longitude)] as [number, number])
+              .addTo(map)
+              .on('click', () => setSelectedProp(prop));
+            return marker;
+          });
+
+          if (validCoords.length > 1) {
+            const group = new (L.default as any).featureGroup(markersRef.current);
+            map.fitBounds(group.getBounds().pad(0.15));
+          }
+        }, 150);
+
+        if (!cancelled) {
+          mapInstanceRef.current = map;
+          leafletLoadedRef.current = true;
+        }
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+      leafletLoadedRef.current = false;
+      markersRef.current = [];
+      if (container) {
+        delete (container as any)._leaflet_id;
+        container.innerHTML = '';
+      }
+    };
+  }, [filteredProperties, userLocation, getValidCoords]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !leafletModuleRef.current) return;
@@ -164,12 +213,16 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
       return marker;
     });
     if (validCoords.length > 1) {
-      const group = new leafletModuleRef.current.featureGroup(markersRef.current);
-      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.15));
+      setTimeout(() => {
+        if (!mapInstanceRef.current || !leafletModuleRef.current) return;
+        mapInstanceRef.current.invalidateSize();
+        const group = new leafletModuleRef.current.featureGroup(markersRef.current);
+        mapInstanceRef.current.fitBounds(group.getBounds().pad(0.15));
+      }, 150);
     } else if (validCoords.length === 1) {
       mapInstanceRef.current.setView([Number(validCoords[0].latitude), Number(validCoords[0].longitude)] as [number, number], 14);
     }
-  }, [filteredProperties]);
+  }, [filteredProperties, getValidCoords]);
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-8">
@@ -304,7 +357,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         </div>
 
         {selectedProp && (
-          <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-[440px] bg-slate-950/98 border border-amber-500/40 rounded-3xl p-5 shadow-2xl backdrop-blur-xl z-[200] animate-in slide-in-from-bottom-3 duration-300">
+          <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md md:w-full bg-slate-950/98 border border-amber-500/40 rounded-3xl p-5 shadow-2xl backdrop-blur-xl z-[200] animate-in slide-in-from-bottom-3 duration-300">
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-base font-black text-white truncate">{selectedProp.title}</h3>
               <button onClick={() => setSelectedProp(null)} className="p-1.5 text-slate-400 hover:text-white bg-slate-900 rounded-lg border border-slate-800 transition-all shrink-0 ml-2">

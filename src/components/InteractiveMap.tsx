@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { MapPin, Navigation, Building2, Bed, Bath, Maximize, ExternalLink, X } from 'lucide-react';
 import { PropertyItem } from '@/context/RealEstateContext';
@@ -18,16 +18,20 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
   const leafletLoadedRef = useRef(false);
   const leafletModuleRef = useRef<any>(null);
 
-  const getValidCoords = () => {
+  const getValidCoords = useCallback(() => {
     return properties.filter(p => {
       const lat = (p as any).latitude;
       const lng = (p as any).longitude;
       return lat != null && lng != null && !isNaN(Number(lat)) && !isNaN(Number(lng));
     });
-  };
+  }, [properties]);
 
-  const initMap = () => {
+  useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current || leafletLoadedRef.current) return;
+
+    leafletLoadedRef.current = true;
+
+    const container = mapRef.current;
 
     import('leaflet').then((L) => {
       import('leaflet/dist/leaflet.css');
@@ -51,7 +55,7 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
         ? [Number((validCoords[0] as any).latitude), Number((validCoords[0] as any).longitude)]
         : [-23.5505, -46.6333];
 
-      const map = (L.default).map(mapRef.current!).setView(center, 13);
+      const map = (L.default).map(container).setView(center, 13);
 
       (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
@@ -71,13 +75,20 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
       }
 
       mapInstanceRef.current = map;
-      leafletLoadedRef.current = true;
     });
-  };
 
-  useEffect(() => {
-    initMap();
-  }, [properties]);
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+      leafletLoadedRef.current = false;
+      markersRef.current = [];
+      if (container) {
+        container.innerHTML = '';
+      }
+    };
+  }, [properties, getValidCoords]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !leafletModuleRef.current) return;
@@ -95,7 +106,7 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
     } else if (validCoords.length === 1) {
       mapInstanceRef.current.setView([Number((validCoords[0] as any).latitude), Number((validCoords[0] as any).longitude)] as [number, number], 14);
     }
-  }, [properties]);
+  }, [properties, getValidCoords]);
 
   return (
     <div className="relative w-full h-[520px] rounded-3xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">

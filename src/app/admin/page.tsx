@@ -13,26 +13,16 @@ import {
   Plus, 
   Edit3, 
   Trash2, 
-  Eye, 
-  Check, 
   X, 
   Search, 
   Filter, 
-  ArrowUpRight, 
-  Phone, 
-  Mail, 
   Save, 
   RefreshCw,
-  TrendingUp,
-  DollarSign,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
   Lock,
-  UserCheck,
   MapPin,
   Smartphone,
-  LogOut,
   SlidersHorizontal,
   Home
 } from 'lucide-react';
@@ -104,7 +94,42 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadAllAdminData() {
+      try {
+        setLoading(true);
+        const [pRes, bRes, lRes, vRes, sRes] = await Promise.all([
+          fetch('/api/properties'),
+          fetch('/api/brokers'),
+          fetch('/api/leads'),
+          fetch('/api/valuation'),
+          fetch('/api/settings')
+        ]);
+
+        const [pData, bData, lData, vData, sData] = await Promise.all([
+          pRes.json(), bRes.json(), lRes.json(), vRes.json(), sRes.json()
+        ]);
+
+        if (!cancelled) {
+          if (pData.success) setProperties(pData.data);
+          if (bData.success) setBrokers(bData.data);
+          if (lData.success) setLeads(lData.data);
+          if (vData.success) setValuations(vData.data);
+          if (sData.success) setSettings(sData.data);
+        }
+      } catch (e) {
+        if (!cancelled) console.error('Error loading admin data:', e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
     loadAllAdminData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Quick WhatsApp Direct Toggle Handler for individual Property

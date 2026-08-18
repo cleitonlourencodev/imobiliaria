@@ -8,9 +8,7 @@ import {
   Building2, 
   DollarSign, 
   Bed, 
-  Hash, 
   Sparkles,
-  ArrowRight,
   Filter
 } from 'lucide-react';
 
@@ -59,7 +57,7 @@ export default function HeroSearch() {
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Search Header Tabs */}
-      <div className="flex items-center gap-1 bg-slate-950/80 p-1.5 rounded-t-2xl border-t border-x border-slate-800 backdrop-blur-md w-fit mx-auto sm:mx-0">
+      <div className="flex items-center gap-1 bg-slate-950/80 p-1.5 rounded-t-3xl border-t border-x border-slate-800 backdrop-blur-md w-full">
         <button
           type="button"
           onClick={() => setActiveTab('todos')}
@@ -112,7 +110,7 @@ export default function HeroSearch() {
       {/* Main Filter Form Box */}
       <form
         onSubmit={handleSearch}
-        className="bg-slate-950/90 border border-slate-800 p-4 sm:p-6 rounded-b-3xl rounded-tr-3xl shadow-2xl backdrop-blur-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
+        className="bg-slate-950/90 border-x border-b border-slate-800 p-4 sm:p-6 rounded-b-3xl shadow-2xl backdrop-blur-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
       >
         {/* Field 1: Localização / Bairro / Cidade */}
         <div className="space-y-1.5 lg:col-span-1">

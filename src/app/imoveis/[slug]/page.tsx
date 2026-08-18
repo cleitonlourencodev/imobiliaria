@@ -16,15 +16,9 @@ import {
   Printer, 
   MessageSquare, 
   Zap, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  Clock, 
+  ShieldCheck, 
   CheckCircle2, 
   Calculator, 
-  PlayCircle, 
-  Compass, 
-  ShieldCheck, 
   ChevronRight,
   User,
   ArrowLeft,
@@ -345,7 +339,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
             </div>
             <div>
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Dormitórios</span>
-              <div className="text-sm font-bold text-white">{property.bedrooms} quatros</div>
+              <div className="text-sm font-bold text-white">{property.bedrooms} quartos</div>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockLeads, mockSettings, mockBrokers, mockProperties } from '@/lib/mock-data';
+import { PropertyItem } from '@/context/RealEstateContext';
 
 export async function GET() {
   const data = mockLeads.map(l => ({
@@ -31,16 +32,17 @@ export async function POST(req: NextRequest) {
     }
 
     const settings = mockSettings;
-    let propertyObj = null;
-    let brokerObj = null;
+    let propertyObj: PropertyItem | null = null;
+    let brokerObj: typeof mockBrokers[0] | null = null;
     let whatsappDirectEnabled = false;
 
     if (propertyId) {
       propertyObj = mockProperties.find(p => p.id === propertyId) || null;
       if (propertyObj) {
-        whatsappDirectEnabled = propertyObj.whatsappDirectEnabled;
-        if (propertyObj.brokerId) {
-          brokerObj = mockBrokers.find(b => b.id === propertyObj.brokerId) || null;
+        const prop = propertyObj;
+        whatsappDirectEnabled = prop.whatsappDirectEnabled;
+        if (prop.brokerId) {
+          brokerObj = mockBrokers.find(b => b.id === prop.brokerId) || null;
         }
       }
     }
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
     const newLead = {
       id: leadId,
       propertyId: propertyId || null,
-      brokerId: brokerObj ? brokerObj.id : null,
+      brokerId: brokerObj ? brokerObj.id : '',
       clientName,
       clientPhone,
       clientEmail: clientEmail || null,
@@ -63,7 +65,7 @@ export async function POST(req: NextRequest) {
       createdAt: new Date(),
       property: propertyObj,
       broker: brokerObj,
-    };
+    } as any;
 
     mockLeads.push(newLead);
 

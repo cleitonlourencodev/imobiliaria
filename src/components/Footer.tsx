@@ -12,7 +12,6 @@ import {
   Clock, 
   MessageSquare,
   Globe,
-  Share2,
   LayoutDashboard
 } from 'lucide-react';
 

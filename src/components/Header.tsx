@@ -14,7 +14,6 @@ import {
   X, 
   PlusCircle, 
   Lock,
-  LayoutDashboard,
   Home,
   MapPin,
   Calculator,

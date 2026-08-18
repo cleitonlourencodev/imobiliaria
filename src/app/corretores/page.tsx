@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, ShieldCheck, MessageSquare, Phone, Mail, Award, CheckCircle2, Building2 } from 'lucide-react';
+import { Users, MessageSquare, Mail, Building2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Bed, 
   Bath, 
@@ -115,13 +114,13 @@ export default function PropertyCard({ property, featuredMode = false }: Propert
         {/* Atendimento VIP Indicator */}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-10">
           {property.whatsappDirectEnabled ? (
-            <div className="px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-950 text-[10px] font-extrabold flex items-center gap-1.5 shadow-lg backdrop-blur-sm border border-amber-300/40">
-              <Zap className="w-3 h-3 fill-slate-950 animate-pulse" />
-              <span>Atendimento VIP Ativo</span>
+            <div className="px-2.5 py-1 rounded-lg bg-amber-500/90 text-slate-950 text-[10px] font-extrabold flex items-center gap-1.5 shadow-lg backdrop-blur-sm border border-amber-300/40 truncate">
+              <Zap className="w-3 h-3 fill-slate-950 animate-pulse shrink-0" />
+              <span className="truncate">Atendimento VIP Ativo</span>
             </div>
           ) : (
-            <div className="px-2.5 py-1 rounded-lg bg-slate-900/90 text-slate-400 text-[10px] font-medium flex items-center gap-1.5 backdrop-blur-sm border border-slate-800">
-              <span>Consultoria Prime</span>
+            <div className="px-2.5 py-1 rounded-lg bg-slate-900/90 text-slate-400 text-[10px] font-medium flex items-center gap-1.5 backdrop-blur-sm border border-slate-800 truncate">
+              <span className="truncate">Consultoria Prime</span>
             </div>
           )}
 
@@ -180,7 +179,7 @@ export default function PropertyCard({ property, featuredMode = false }: Propert
 
           <div className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-slate-950/50 border border-slate-800/60" title="Vagas de Garagem">
             <Car className="w-3.5 h-3.5 text-amber-400 mb-1" />
-            <span>{property.parkingSpaces > 0 ? `${property.parkingSpaces} veg` : '-'}</span>
+            <span>{property.parkingSpaces > 0 ? `${property.parkingSpaces} vag` : '-'}</span>
           </div>
         </div>
 

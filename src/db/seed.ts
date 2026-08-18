@@ -3,7 +3,11 @@ import { brokers, properties, siteSettings, leads } from './schema';
 
 export async function seedDatabase() {
   try {
-    // Check if settings exist
+    if (!db) {
+      console.error('Database not initialized. Check DATABASE_URL.');
+      return;
+    }
+
     const existingSettings = await db.select().from(siteSettings).limit(1);
     if (existingSettings.length > 0) {
       return;

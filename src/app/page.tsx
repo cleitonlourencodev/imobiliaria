@@ -17,10 +17,7 @@ import {
   Calculator, 
   PhoneCall, 
   ChevronRight,
-  Layers,
-  Search,
-  Home as HomeIcon,
-  Maximize2
+  Search
 } from 'lucide-react';
 
 import Header from '@/components/Header';

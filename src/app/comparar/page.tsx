@@ -6,7 +6,6 @@ import {
   Scale, 
   X, 
   Building2, 
-  MapPin, 
   Bed, 
   Bath, 
   Car, 

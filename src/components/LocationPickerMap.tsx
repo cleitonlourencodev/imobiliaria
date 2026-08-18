@@ -18,6 +18,7 @@ export default function LocationPickerMap({
 }: LocationPickerMapProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPos, setSelectedPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
@@ -25,10 +26,6 @@ export default function LocationPickerMap({
 
   const lat = latitude ? Number(latitude) : -23.5505;
   const lng = longitude ? Number(longitude) : -46.6333;
-
-  useEffect(() => {
-    setSelectedPos({ lat: Number(lat), lng: Number(lng) });
-  }, [lat, lng]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current || leafletLoadedRef.current) return;
@@ -79,8 +76,9 @@ export default function LocationPickerMap({
       }
 
       leafletLoadedRef.current = true;
+      setMapReady(true);
     });
-  }, []);
+  }, [lat, lng, onLocationChange]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !selectedPos) return;
@@ -168,7 +166,7 @@ export default function LocationPickerMap({
 
       <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
         <div ref={mapRef} className="w-full h-full" />
-        {!leafletLoadedRef.current && (
+        {!mapReady && (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-950">
             <div className="text-center space-y-2">
               <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
