@@ -163,9 +163,9 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
           maxZoom: 20,
         }).addTo(map);
 
-        setTimeout(() => {
+        const initMap = () => {
           if (cancelled) return;
-          map.invalidateSize();
+          try { map.invalidateSize(); } catch (e) { /* ignore */ }
 
           markersRef.current = validCoords.map((prop) => {
             const marker = (L.default).marker([Number(prop.latitude), Number(prop.longitude)] as [number, number])
@@ -176,14 +176,20 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
 
           if (validCoords.length > 1) {
             const group = new (L.default as any).featureGroup(markersRef.current);
-            map.fitBounds(group.getBounds().pad(0.15));
+            map.fitBounds(group.getBounds().pad(0.15), { animate: false, maxZoom: 16 });
           }
-        }, 150);
+        };
+
+        map.whenReady(initMap);
+        setTimeout(initMap, 300);
 
         if (!cancelled) {
           mapInstanceRef.current = map;
           leafletLoadedRef.current = true;
         }
+      }).catch(err => {
+        console.error('Leaflet load error:', err);
+        leafletLoadedRef.current = false;
       });
     });
 

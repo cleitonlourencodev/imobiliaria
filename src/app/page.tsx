@@ -6,7 +6,6 @@ import {
   Building2, 
   Sparkles, 
   Zap, 
-  MessageSquare, 
   CheckCircle2, 
   ArrowRight, 
   Award, 
@@ -23,6 +22,7 @@ import {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSearch from '@/components/HeroSearch';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
 import PropertyCard from '@/components/PropertyCard';
 import InteractiveModernMap from '@/components/InteractiveModernMap';
 import { PropertyItem } from '@/context/RealEstateContext';
@@ -394,7 +394,7 @@ export default function HomePage() {
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md"
                   >
-                    <MessageSquare className="w-3.5 h-3.5 fill-white" />
+                    <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
                     <span>WhatsApp</span>
                   </a>
                 </div>

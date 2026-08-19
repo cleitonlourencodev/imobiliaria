@@ -14,7 +14,6 @@ import {
   Scale, 
   Share2, 
   Printer, 
-  MessageSquare, 
   Zap, 
   ShieldCheck, 
   CheckCircle2, 
@@ -30,6 +29,7 @@ import Footer from '@/components/Footer';
 import PropertyCard from '@/components/PropertyCard';
 import { PropertyItem, useRealEstate } from '@/context/RealEstateContext';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
 
 export default function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
@@ -642,7 +642,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
                   disabled={submitting}
                   className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
                 >
-                  <MessageSquare className="w-4 h-4 fill-white" />
+                  <WhatsappIcon className="w-4 h-4 fill-white" />
                   <span>{submitting ? 'Gerando Notificação...' : 'Falar no WhatsApp com o Corretor'}</span>
                 </button>
               </form>

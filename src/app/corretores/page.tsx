@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, MessageSquare, Mail, Building2 } from 'lucide-react';
+import { Users, Mail, Building2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
 
 export default function BrokersPage() {
   const [brokers, setBrokers] = useState<any[]>([]);
@@ -110,7 +111,7 @@ export default function BrokersPage() {
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg"
                   >
-                    <MessageSquare className="w-4 h-4 fill-white" />
+                    <WhatsappIcon className="w-4 h-4 fill-white" />
                     <span>Conversar no WhatsApp</span>
                   </a>
                 </div>

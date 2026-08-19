@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -8,7 +8,6 @@ import {
   Heart, 
   Scale, 
   Phone, 
-  MessageSquare, 
   ShieldCheck, 
   Menu, 
   X, 
@@ -21,11 +20,69 @@ import {
   Users
 } from 'lucide-react';
 import { useRealEstate } from '@/context/RealEstateContext';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+      <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+    </svg>
+  );
+}
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
   const { favorites, comparedProperties } = useRealEstate();
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadSettings = () => {
+        fetch('/api/settings')
+          .then(r => r.json())
+          .then(data => {
+            if (!cancelled && data.success) {
+              setSettings(data.data);
+            }
+          })
+        .catch(err => console.error('[Header] settings error', err));
+    };
+    loadSettings();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      fetch('/api/settings')
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) setSettings(data.data);
+        })
+        .catch(console.error);
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const isLinkActive = (href: string) => {
     if (href === '/' && pathname === '/') return true;
@@ -44,10 +101,25 @@ export default function Header() {
     { name: 'Financiamento', href: '/financiamento', icon: Calculator },
   ];
 
+  const defaultSocialLinks = [
+    { key: 'socialInstagram', icon: InstagramIcon, label: 'Instagram', color: 'hover:text-pink-400', href: 'https://instagram.com' },
+    { key: 'socialFacebook', icon: FacebookIcon, label: 'Facebook', color: 'hover:text-blue-400', href: 'https://facebook.com' },
+    { key: 'socialYoutube', icon: YoutubeIcon, label: 'YouTube', color: 'hover:text-red-400', href: 'https://youtube.com' },
+    { key: 'socialWhatsapp', icon: WhatsappIcon, label: 'WhatsApp', color: 'hover:text-emerald-400', href: 'https://wa.me/5511998887777' },
+  ];
+
+  const socialLinks = defaultSocialLinks.map(s => ({
+    ...s,
+    href: settings?.[s.key] || s.href
+  }));
+
+  const phoneDisplay = settings?.phone || '(11) 3890-4000';
+  const phoneHref = `tel:${(settings?.phone || '1138904000').replace(/\D/g, '')}`;
+
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-100 transition-all duration-200 overflow-hidden">
+    <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-100 transition-all duration-200">
       {/* Top Banner with Discrete System Access Button at Top Right */}
-      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-slate-300 text-xs py-1.5 px-4 sm:px-8 border-b border-slate-800/80 overflow-hidden">
+      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-slate-300 text-xs py-1.5 px-4 sm:px-8 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto flex justify-between items-center gap-2 flex-wrap">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-slate-400">
@@ -58,13 +130,26 @@ export default function Header() {
             <span className="hidden md:inline text-slate-400">Seg a Sáb: 08:00 às 19:00</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {socialLinks.map(({ key, icon: Icon, label, color, href }) => (
+              <a
+                key={key}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={label}
+                className={`flex items-center justify-center p-1.5 rounded-lg text-slate-400 ${color} transition-colors`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+              </a>
+            ))}
+
             <a 
-              href="tel:1138904000" 
+              href={phoneHref} 
               className="hidden sm:flex items-center gap-1 text-slate-300 hover:text-amber-400 transition-colors font-medium text-[11px]"
             >
               <Phone className="w-3 h-3 text-amber-400" />
-              (11) 3890-4000
+              {phoneDisplay}
             </a>
 
             <span className="hidden sm:inline text-slate-800">|</span>
@@ -164,7 +249,7 @@ export default function Header() {
             title="WhatsApp"
             className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
           >
-            <MessageSquare className="w-4 h-4 fill-white" />
+            <WhatsappIcon className="w-4 h-4 fill-white" />
           </a>
         </div>
 

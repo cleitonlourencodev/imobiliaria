@@ -348,6 +348,9 @@ export const mockSettings = {
   heroTitle: 'Encontre o imóvel ideal para seu estilo de vida',
   heroSubtitle: 'Seu portal completo de Vendas e Aluguéis de Casas, Terrenos, Apartamentos e Coberturas.',
   whatsappTemplateMsg: 'Olá! Tenho interesse no imóvel *{title}* (Cód: *{code}*), no valor de *{price}*. Gostaria de mais informações!',
+  socialInstagram: '',
+  socialFacebook: '',
+  socialYoutube: '',
 };
 
 export const mockLeads = [

@@ -21,6 +21,9 @@ export async function PUT(req: NextRequest) {
     if (body.heroTitle !== undefined) updatePayload.heroTitle = body.heroTitle;
     if (body.heroSubtitle !== undefined) updatePayload.heroSubtitle = body.heroSubtitle;
     if (body.whatsappTemplateMsg !== undefined) updatePayload.whatsappTemplateMsg = body.whatsappTemplateMsg;
+    if (body.socialInstagram !== undefined) updatePayload.socialInstagram = body.socialInstagram;
+    if (body.socialFacebook !== undefined) updatePayload.socialFacebook = body.socialFacebook;
+    if (body.socialYoutube !== undefined) updatePayload.socialYoutube = body.socialYoutube;
 
     Object.assign(mockSettings, updatePayload);
 

@@ -30,53 +30,72 @@ export default function LocationPickerMap({
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current || leafletLoadedRef.current) return;
 
-    import('leaflet').then((L) => {
-      import('leaflet/dist/leaflet.css');
+    const container = mapRef.current;
 
-      const defaultIcon = (L.default as any).icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
-
-      (L.default as any).Marker.prototype.options.icon = defaultIcon;
-
-      const map = (L.default).map(mapRef.current!).setView([lat, lng], 16);
-
-      (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 20,
-      }).addTo(map);
-
-      map.on('click', (e: any) => {
-        const { lat: newLat, lng: newLng } = e.latlng;
-        const roundedLat = Number(newLat.toFixed(6));
-        const roundedLng = Number(newLng.toFixed(6));
-        setSelectedPos({ lat: roundedLat, lng: roundedLng });
-        if (markerRef.current) {
-          markerRef.current.setLatLng([roundedLat, roundedLng]);
+    const waitForContainer = () => new Promise<void>((resolve) => {
+      const check = () => {
+        const rect = container.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          resolve();
         } else {
-          markerRef.current = (L.default).marker([roundedLat, roundedLng]).addTo(map);
+          requestAnimationFrame(check);
         }
-        onLocationChange(roundedLat.toString(), roundedLng.toString());
+      };
+      check();
+    });
+
+    waitForContainer().then(() => {
+      import('leaflet').then((L) => {
+        import('leaflet/dist/leaflet.css');
+
+        const defaultIcon = (L.default as any).icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        });
+
+        (L.default as any).Marker.prototype.options.icon = defaultIcon;
+
+        const map = (L.default).map(container!).setView([lat, lng], 16);
+
+        (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 20,
+        }).addTo(map);
+
+        map.on('click', (e: any) => {
+          const { lat: newLat, lng: newLng } = e.latlng;
+          const roundedLat = Number(newLat.toFixed(6));
+          const roundedLng = Number(newLng.toFixed(6));
+          setSelectedPos({ lat: roundedLat, lng: roundedLng });
+          if (markerRef.current) {
+            markerRef.current.setLatLng([roundedLat, roundedLng]);
+          } else {
+            markerRef.current = (L.default).marker([roundedLat, roundedLng]).addTo(map);
+          }
+          onLocationChange(roundedLat.toString(), roundedLng.toString());
+        });
+
+        mapInstanceRef.current = map;
+
+        if (lat && lng) {
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          } else {
+            markerRef.current = (L.default).marker([lat, lng]).addTo(map);
+          }
+        }
+
+        leafletLoadedRef.current = true;
+        setMapReady(true);
+      }).catch(err => {
+        console.error('Leaflet load error:', err);
+        leafletLoadedRef.current = false;
       });
-
-      mapInstanceRef.current = map;
-
-      if (lat && lng) {
-        if (markerRef.current) {
-          markerRef.current.setLatLng([lat, lng]);
-        } else {
-          markerRef.current = (L.default).marker([lat, lng]).addTo(map);
-        }
-      }
-
-      leafletLoadedRef.current = true;
-      setMapReady(true);
     });
   }, [lat, lng, onLocationChange]);
 

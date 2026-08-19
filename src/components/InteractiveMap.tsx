@@ -33,53 +33,70 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
 
     const container = mapRef.current;
 
-    import('leaflet').then((L) => {
-      import('leaflet/dist/leaflet.css');
+    const waitForContainer = () => new Promise<void>((resolve) => {
+      const check = () => {
+        const rect = container.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          resolve();
+        } else {
+          requestAnimationFrame(check);
+        }
+      };
+      check();
+    });
 
-      leafletModuleRef.current = L.default;
+    waitForContainer().then(() => {
+      import('leaflet').then((L) => {
+        import('leaflet/dist/leaflet.css');
 
-      const defaultIcon = (L.default as any).icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+        leafletModuleRef.current = L.default;
+
+        const defaultIcon = (L.default as any).icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        });
+
+        (L.default as any).Marker.prototype.options.icon = defaultIcon;
+
+        const validCoords = getValidCoords();
+        const center: [number, number] = validCoords.length > 0
+          ? [Number((validCoords[0] as any).latitude), Number((validCoords[0] as any).longitude)]
+          : [-23.5505, -46.6333];
+
+        const map = (L.default).map(container).setView(center, 13);
+
+        (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 20,
+        }).addTo(map);
+
+        markersRef.current = validCoords.map((prop) => {
+          const marker = (L.default as any).marker([Number((prop as any).latitude), Number((prop as any).longitude)] as [number, number])
+            .addTo(map)
+            .on('click', () => setSelectedProp(prop));
+          return marker;
+        });
+
+        if (validCoords.length > 1) {
+          const group = new (L.default as any).featureGroup(markersRef.current);
+          map.fitBounds(group.getBounds().pad(0.15));
+        }
+
+        mapInstanceRef.current = map;
+      }).catch(err => {
+        console.error('Leaflet load error:', err);
+        leafletLoadedRef.current = false;
       });
-
-      (L.default as any).Marker.prototype.options.icon = defaultIcon;
-
-      const validCoords = getValidCoords();
-      const center: [number, number] = validCoords.length > 0
-        ? [Number((validCoords[0] as any).latitude), Number((validCoords[0] as any).longitude)]
-        : [-23.5505, -46.6333];
-
-      const map = (L.default).map(container).setView(center, 13);
-
-      (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 20,
-      }).addTo(map);
-
-      markersRef.current = validCoords.map((prop) => {
-        const marker = (L.default as any).marker([Number((prop as any).latitude), Number((prop as any).longitude)] as [number, number])
-          .addTo(map)
-          .on('click', () => setSelectedProp(prop));
-        return marker;
-      });
-
-      if (validCoords.length > 1) {
-        const group = new (L.default as any).featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15));
-      }
-
-      mapInstanceRef.current = map;
     });
 
     return () => {
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try { mapInstanceRef.current.remove(); } catch (e) { /* ignore */ }
         mapInstanceRef.current = null;
       }
       leafletLoadedRef.current = false;

@@ -9,11 +9,11 @@ import {
   Mail, 
   ShieldCheck, 
   ChevronRight, 
-  Clock, 
-  MessageSquare,
+  Clock,
   Globe,
   LayoutDashboard
 } from 'lucide-react';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
 
 export default function Footer() {
   return (
@@ -53,10 +53,10 @@ export default function Footer() {
                 FB
               </a>
               <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-bold">
-                IN
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-bold">
                 YT
+              </a>
+              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all text-xs font-bold">
+                <WhatsappIcon className="w-4 h-4 fill-current" />
               </a>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function Footer() {
                 <span>(11) 3890-4000</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                <WhatsappIcon className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>WhatsApp: (11) 99888-7777</span>
               </div>
               <div className="flex items-center gap-2.5">

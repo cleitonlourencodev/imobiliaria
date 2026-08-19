@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
+import WhatsappIcon from '@/components/icons/WhatsappIcon';
 import ImageUploader from '@/components/ImageUploader';
 import LocationPickerMap from '@/components/LocationPickerMap';
 
@@ -813,7 +814,7 @@ export default function AdminPage() {
                               rel="noopener noreferrer"
                               className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-1.5"
                             >
-                              <MessageSquare className="w-3.5 h-3.5 fill-white" />
+                               <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
                               <span>Iniciar Chat</span>
                             </a>
                           </td>
@@ -913,6 +914,48 @@ export default function AdminPage() {
                     onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs mt-1"
                   />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <h3 className="text-xs font-bold text-slate-200 mt-2 mb-2">Redes Sociais</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="settings-socialInstagram" className="text-xs font-semibold text-slate-300">Instagram</label>
+                      <input
+                        id="settings-socialInstagram"
+                        name="socialInstagram"
+                        type="text"
+                        value={settings.socialInstagram || ''}
+                        onChange={(e) => setSettings({ ...settings, socialInstagram: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs mt-1"
+                        placeholder="https://instagram.com/suaempresa"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="settings-socialFacebook" className="text-xs font-semibold text-slate-300">Facebook</label>
+                      <input
+                        id="settings-socialFacebook"
+                        name="socialFacebook"
+                        type="text"
+                        value={settings.socialFacebook || ''}
+                        onChange={(e) => setSettings({ ...settings, socialFacebook: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs mt-1"
+                        placeholder="https://facebook.com/suaempresa"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="settings-socialYoutube" className="text-xs font-semibold text-slate-300">YouTube</label>
+                      <input
+                        id="settings-socialYoutube"
+                        name="socialYoutube"
+                        type="text"
+                        value={settings.socialYoutube || ''}
+                        onChange={(e) => setSettings({ ...settings, socialYoutube: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs mt-1"
+                        placeholder="https://youtube.com/@suaempresa"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

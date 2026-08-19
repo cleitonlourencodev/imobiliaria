@@ -116,12 +116,16 @@ export const siteSettings = pgTable('site_settings', {
   phone: text('phone').notNull().default('(11) 3890-4000'),
   whatsappDefault: text('whatsapp_default').notNull().default('5511998887777'),
   email: text('email').notNull().default('contato@primeimoveis.com.br'),
-  address: text('address').notNull().default('Av. Brigadeiro Faria Lima, 2200 - Ithaim Bibi, São Paulo - SP'),
+  address: text('address').notNull().default('Av. Brigadeiro Faria Lima, 2200 - Itaim Bibi, São Paulo - SP'),
   
   heroTitle: text('hero_title').notNull().default('Encontre o imóvel dos seus sonhos com atendimento exclusivo'),
   heroSubtitle: text('hero_subtitle').notNull().default('Casas, apartamentos, terrenos e oportunidades de investimento nas melhores localizações.'),
   
   whatsappTemplateMsg: text('whatsapp_template_msg').notNull().default('Olá! Tenho interesse no imóvel *{title}* (Cód: *{code}*), no valor de *{price}*. Poderia me passar mais detalhes?'),
+  
+  socialInstagram: text('social_instagram').default(''),
+  socialFacebook: text('social_facebook').default(''),
+  socialYoutube: text('social_youtube').default(''),
   
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
