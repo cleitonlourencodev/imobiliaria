@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Building2, 
@@ -14,8 +14,32 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
+import InstagramIcon from '@/components/icons/InstagramIcon';
+import FacebookIcon from '@/components/icons/FacebookIcon';
+import YoutubeIcon from '@/components/icons/YoutubeIcon';
 
 export default function Footer() {
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (!cancelled && data.success) setSettings(data.data);
+      })
+      .catch(err => console.error('[Footer] settings error', err));
+    return () => { cancelled = true; };
+  }, []);
+
+  const whatsappHref = `https://wa.me/${(settings?.whatsappDefault || '5511998887777').replace(/\D/g, '')}`;
+  const socialLinks = [
+    { key: 'socialInstagram', icon: InstagramIcon, label: 'Instagram', href: settings?.socialInstagram || 'https://instagram.com', color: 'hover:text-pink-400 hover:border-pink-500/50' },
+    { key: 'socialFacebook', icon: FacebookIcon, label: 'Facebook', href: settings?.socialFacebook || 'https://facebook.com', color: 'hover:text-blue-400 hover:border-blue-500/50' },
+    { key: 'socialYoutube', icon: YoutubeIcon, label: 'YouTube', href: settings?.socialYoutube || 'https://youtube.com', color: 'hover:text-red-400 hover:border-red-500/50' },
+    { key: 'socialWhatsapp', icon: WhatsappIcon, label: 'WhatsApp', href: whatsappHref, color: 'hover:text-emerald-400 hover:border-emerald-500/50' },
+  ];
+
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -46,18 +70,18 @@ export default function Footer() {
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5 text-amber-500" /> Redes Sociais da Imobiliária:
               </span>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-bold">
-                IG
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-bold">
-                FB
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-bold">
-                YT
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all text-xs font-bold">
-                <WhatsappIcon className="w-4 h-4 fill-current" />
-              </a>
+              {socialLinks.map(({ key, icon: Icon, label, color, href }) => (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={label}
+                  className={`w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 ${color} transition-all`}
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
             </div>
           </div>
 

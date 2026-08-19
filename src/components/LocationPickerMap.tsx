@@ -60,7 +60,7 @@ export default function LocationPickerMap({
 
         (L.default as any).Marker.prototype.options.icon = defaultIcon;
 
-        const map = (L.default).map(container!).setView([lat, lng], 16);
+        const map = (L.default).map(container!, { attributionControl: false }).setView([lat, lng], 16);
 
         (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',

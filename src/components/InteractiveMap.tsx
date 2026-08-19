@@ -68,7 +68,7 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
           ? [Number((validCoords[0] as any).latitude), Number((validCoords[0] as any).longitude)]
           : [-23.5505, -46.6333];
 
-        const map = (L.default).map(container).setView(center, 13);
+        const map = (L.default).map(container, { attributionControl: false }).setView(center, 13);
 
         (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',

@@ -156,7 +156,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
           ? [Number(validCoords[0].latitude), Number(validCoords[0].longitude)]
           : (userLocation ? [userLocation.lat, userLocation.lng] : [-23.5505, -46.6333]);
 
-        const map = (L.default).map(container).setView(center, 13);
+        const map = (L.default).map(container, { attributionControl: false }).setView(center, 13);
 
         (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',
