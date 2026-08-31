@@ -186,7 +186,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Nav Links + Actions */}
-        <div className="hidden xl:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-2xl border border-slate-800">
+        <div className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-2xl border border-slate-800">
           {navLinks.map((link) => {
             const active = isLinkActive(link.href);
             return (
