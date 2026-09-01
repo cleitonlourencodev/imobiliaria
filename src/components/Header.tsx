@@ -199,8 +199,10 @@ export default function Header() {
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
-                <link.icon className={`w-3.5 h-3.5 ${active ? 'text-slate-950' : 'text-slate-400'}`} />
-                {link.name}
+                <span className="flex items-center gap-1.5">
+                  <link.icon className={`w-3.5 h-3.5 ${active ? 'text-slate-950' : 'text-slate-400'}`} />
+                  {link.name}
+                </span>
               </Link>
             );
           })}
