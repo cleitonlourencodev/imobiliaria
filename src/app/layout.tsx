@@ -4,7 +4,7 @@ import { RealEstateProvider } from '@/context/RealEstateContext';
 
 export const metadata: Metadata = {
   title: 'Prime Imóveis & Negócios | Portal Imobiliário de Alto Padrão',
-  description: 'Portal completo da Prime Imóveis & Negócios para venda, locação e avaliação de imóveis de alto padrão, com atendimento VIP, mapa interativo, simulador de financiamento e ferramentas modernas.',
+  description: 'Portal completo da Prime Imóveis & Negócios para venda, locação e avaliação de imóveis de alto padrão, com atendimento VIP, mapa interativo e ferramentas modernas.',
 };
 
 export default function RootLayout({

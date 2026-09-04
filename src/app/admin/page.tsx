@@ -249,7 +249,6 @@ export default function AdminPage() {
   const leadChartData = [
     { name: 'WhatsApp Direto', val: directWhatsappLeads },
     { name: 'Visitas Agendadas', val: leads.filter(l => l.type === 'agendamento_visita').length },
-    { name: 'Financiamento', val: leads.filter(l => l.type === 'simulacao_financiamento').length },
     { name: 'Geral', val: leads.filter(l => l.type === 'contato_geral').length },
   ];
 

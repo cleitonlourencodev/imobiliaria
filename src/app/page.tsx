@@ -94,81 +94,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* STATS STRIP */}
-      <section className="border-y border-slate-800/80 bg-slate-900/60 py-8 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">500+</div>
-            <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Imóveis Selecionados</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">R$ 240M+</div>
-            <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Em Negócios Fechados</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">100%</div>
-            <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Corretores com CRECI</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">15 min</div>
-            <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tempo Médio Resposta WhatsApp</div>
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURE BANNER: Modern Real Estate Experience */}
-      <section className="py-16 px-4 sm:px-8 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[150px] pointer-events-none" />
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-amber-500/30 text-amber-400 text-xs font-bold backdrop-blur-md shadow-md">
-              <Sparkles className="w-4 h-4" />
-              <span>Experiência Imobiliária Moderna</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight">
-              Encontre o imóvel ideal com <span className="text-amber-400">atendimento personalizado</span> e tecnologia avançada
-            </h2>
-
-            <p className="text-sm text-slate-300 leading-relaxed">
-              A Prime Imóveis oferece uma experiência completa para quem busca vender, alugar ou investir. Com atendimento especializado, mapas interativos, simulador de financiamento e avaliações inteligentes, você tem tudo o que precisa para tomar a melhor decisão no mercado imobiliário.
-            </p>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/avaliacao" className="px-5 py-2.5 rounded-2xl bg-amber-500 text-slate-950 text-xs font-black hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20">
-                Avaliar Meu Imóvel
-              </Link>
-              <Link href="/mapa" className="px-5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700 text-white text-xs font-bold hover:border-amber-500 hover:text-amber-400 transition-all">
-                Ver Mapa Interativo
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
-            <h3 className="text-base font-black text-white flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-amber-400" />
-              Por que Escolher a Prime?
-            </h3>
-            <ul className="space-y-3 text-xs text-slate-300">
-              {[
-                'Corretores credenciados com CRECI ativo e atendimento especializado',
-                'Mapa interativo com filtros de venda, aluguel e categorias de imóveis',
-                'Simulador de financiamento com comparação entre os principais bancos',
-                'Avaliação inteligente de imóveis para proprietários',
-                'Comparador de imóveis para análise lado a lado',
-                'Atendimento via WhatsApp com resposta rápida e eficiente',
-                'Experiência moderna com design premium e navegação intuitiva'
-              ].map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
       {/* FEATURED PROPERTIES LISTINGS */}
       <section className="py-20 px-4 sm:px-8 max-w-7xl mx-auto w-full space-y-10">
         
@@ -338,14 +263,6 @@ export default function HomePage() {
 
       {/* MAP SECTION */}
       <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto w-full space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">Navegação Visual</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">Explorar Imóveis pelo Mapa</h2>
-          </div>
-          <p className="text-xs text-slate-400">Clique nos valores no mapa para pré-visualizar as informações do imóvel.</p>
-        </div>
-
         <InteractiveModernMap properties={properties} />
         <div className="flex items-center justify-end pt-2">
           <Link
@@ -367,39 +284,44 @@ export default function HomePage() {
             <p className="text-xs text-slate-400">Atendimento personalizado com corretores credenciados e experientes.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brokers.map((broker) => (
-              <div key={broker.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-amber-500/50 transition-all shadow-xl">
-                <div className="flex items-start gap-4">
-                  <img
-                    src={broker.photoUrl}
-                    alt={broker.name}
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-500/60 shrink-0"
-                  />
-                  <div>
-                    <h3 className="text-base font-bold text-white">{broker.name}</h3>
-                    <span className="text-xs font-mono text-amber-400 font-semibold">{broker.creci}</span>
-                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{broker.bio}</p>
+          <div className="marquee-viewport">
+            <div className="marquee-track">
+              {[...brokers, ...brokers].map((broker, idx) => (
+                <div
+                  key={`${broker.id}-${idx}`}
+                  className="marquee-card bg-slate-900 border border-slate-800 rounded-3xl flex flex-col justify-between space-y-4 hover:border-amber-500/50 shadow-xl"
+                >
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={broker.photoUrl}
+                      alt={broker.name}
+                      className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-500/60 shrink-0"
+                    />
+                    <div>
+                      <h3 className="text-base font-bold text-white">{broker.name}</h3>
+                      <span className="text-xs font-mono text-amber-400 font-semibold">{broker.creci}</span>
+                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{broker.bio}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">
+                      {broker.activeListingsCount || 0} imóveis geridos
+                    </span>
+
+                    <a
+                      href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20um%20atendimento%20imobili%C3%A1rio.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md"
+                    >
+                      <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
+                      <span>WhatsApp</span>
+                    </a>
                   </div>
                 </div>
-
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-medium">
-                    {broker.activeListingsCount || 0} imóveis geridos
-                  </span>
-
-                  <a
-                    href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20um%20atendimento%20imobili%C3%A1rio.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md"
-                  >
-                    <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
-                    <span>WhatsApp</span>
-                  </a>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>

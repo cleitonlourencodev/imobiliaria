@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-viewport {
+  overflow: hidden;
+  padding-block: 1.25rem;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 60s linear infinite;
+  will-change: transform;
+}
+
+.marquee-card {
+  flex: 0 0 auto;
+  width: 320px;
+  margin-right: 1.5rem;
+  padding: 1.5rem;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transform-origin: center center;
+}
+
+@media (min-width: 640px) {
+  .marquee-card {
+    width: 360px;
+  }
+}
+
+.marquee-card:hover {
+  animation-play-state: paused;
+  transform: scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.25);
+  z-index: 10;
+}
+
+.marquee-viewport:hover .marquee-track {
+  animation-play-state: paused;
+}

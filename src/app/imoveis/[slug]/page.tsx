@@ -17,7 +17,6 @@ import {
   Zap, 
   ShieldCheck, 
   CheckCircle2, 
-  Calculator, 
   ChevronRight,
   User,
   ArrowLeft,
@@ -46,16 +45,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientEmail, setClientEmail] = useState('');
-  const [leadType, setLeadType] = useState<'whatsapp_direto' | 'agendamento_visita' | 'simulacao_financiamento'>('whatsapp_direto');
+  const [leadType, setLeadType] = useState<'whatsapp_direto' | 'agendamento_visita'>('whatsapp_direto');
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  // Financing Calculator Local State
-  const [downPaymentPct, setDownPaymentPct] = useState<number>(20);
-  const [loanYears, setDownLoanYears] = useState<number>(30);
-  const [annualRate, setAnnualRate] = useState<number>(10.5);
 
   useEffect(() => {
     async function loadProperty() {
@@ -114,16 +108,6 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
   const favorited = isFavorite(property.id);
   const compared = isInCompare(property.id);
-
-  // Mortgage calculations
-  const priceVal = parseFloat(property.price) || 0;
-  const downPaymentVal = (priceVal * downPaymentPct) / 100;
-  const loanVal = Math.max(0, priceVal - downPaymentVal);
-  const monthlyRate = annualRate / 12 / 100;
-  const totalMonths = loanYears * 12;
-  const monthlyPayment = loanVal > 0 && monthlyRate > 0
-    ? (loanVal * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths))) / (Math.pow(1 + monthlyRate, totalMonths) - 1)
-    : 0;
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -415,81 +399,6 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
                 </div>
               </div>
             )}
-
-            {/* Mortgage Simulator Embedded */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Calculator className="w-5 h-5 text-amber-400" />
-                    Simulador de Financiamento Estimado
-                  </h3>
-                  <p className="text-xs text-slate-400">Simule a entrada e parcelas estimadas para este imóvel.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="downPaymentPct" className="text-xs font-semibold text-slate-300">Entrada ({downPaymentPct}%)</label>
-                  <input
-                    id="downPaymentPct"
-                    name="downPaymentPct"
-                    type="range"
-                    min="10"
-                    max="80"
-                    value={downPaymentPct}
-                    onChange={(e) => setDownPaymentPct(Number(e.target.value))}
-                    className="w-full accent-amber-500"
-                  />
-                  <span className="text-xs font-mono font-bold text-amber-400">{formatCurrencyBRL(downPaymentVal)}</span>
-                </div>
-
-                <div>
-                  <label htmlFor="loanYears" className="text-xs font-semibold text-slate-300">Prazo ({loanYears} anos)</label>
-                  <input
-                    id="loanYears"
-                    name="loanYears"
-                    type="range"
-                    min="5"
-                    max="35"
-                    value={loanYears}
-                    onChange={(e) => setDownLoanYears(Number(e.target.value))}
-                    className="w-full accent-amber-500"
-                  />
-                  <span className="text-xs font-mono font-bold text-amber-400">{loanYears} Anos ({totalMonths} meses)</span>
-                </div>
-
-                <div>
-                  <label htmlFor="annualRate" className="text-xs font-semibold text-slate-300">Taxa Anual Média</label>
-                  <input
-                    id="annualRate"
-                    name="annualRate"
-                    type="number"
-                    step="0.1"
-                    value={annualRate}
-                    onChange={(e) => setAnnualRate(Number(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-                  />
-                  <span className="text-xs text-slate-400">{annualRate}% a.a.</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <span className="text-xs text-slate-400">Parcela Inicial Estimada (SAC):</span>
-                  <div className="text-2xl font-black text-amber-400">
-                    {formatCurrencyBRL(monthlyPayment)} <span className="text-xs font-normal text-slate-400">/mês</span>
-                  </div>
-                </div>
-
-                <Link
-                  href="/financiamento"
-                  className="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-400 transition-colors"
-                >
-                  Comparar com Bancos (Caixa, Itaú...)
-                </Link>
-              </div>
-            </div>
           </div>
 
           {/* Right Column: Responsible Broker & Lead Direct Contact Box */}

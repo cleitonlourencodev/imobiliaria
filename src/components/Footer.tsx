@@ -143,12 +143,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/financiamento" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
-                  <ChevronRight className="w-3.5 h-3.5 text-amber-500" />
-                  Simulador de Financiamento
-                </Link>
-              </li>
-              <li>
                 <Link href="/comparar" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <ChevronRight className="w-3.5 h-3.5 text-amber-500" />
                   Comparador de Imóveis

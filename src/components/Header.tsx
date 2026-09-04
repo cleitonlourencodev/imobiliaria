@@ -15,7 +15,6 @@ import {
   Lock,
   Home,
   MapPin,
-  Calculator,
   Award,
   Users
 } from 'lucide-react';
@@ -98,7 +97,6 @@ export default function Header() {
     { name: 'Terrenos', href: '/imoveis?category=terreno', icon: MapPin },
     { name: 'Corretores', href: '/corretores', icon: Users },
     { name: 'Avaliar Imóvel', href: '/avaliacao', icon: Award },
-    { name: 'Financiamento', href: '/financiamento', icon: Calculator },
   ];
 
   const defaultSocialLinks = [
