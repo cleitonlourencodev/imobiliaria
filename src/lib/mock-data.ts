@@ -391,3 +391,55 @@ export const mockLeads = [
     broker: null,
   }
 ];
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  link: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const mockFaqs: FaqItem[] = [
+  {
+    id: 'faq-1',
+    question: 'Como faço para agendar uma visita ao imóvel?',
+    answer: 'Fale conosco pelo WhatsApp ou pelo formulário de contato e um corretor entrará em contato para marcar uma visita na sua disponibilidade.',
+    link: 'https://wa.me/5511998887777',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'faq-2',
+    question: 'Quais os documentos necessários para comprar um imóvel?',
+    answer: 'Para a compra você precisará de documentos pessoais, comprovante de renda, extrato bancário e o registro imobiliário. Consulte seu contador para a documentação fiscal completa.',
+    link: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'faq-3',
+    question: 'A imobiliária oferece simulação de financiamento?',
+    answer: 'Trabalhamos com as principais construtoras e bancos para oferecer as melhores condições de financiamento. Você pode simular sua parcela diretamente no site do seu banco ou solicitar ao corretor.',
+    link: 'https://www.bancoob.com.br',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'faq-4',
+    question: 'Como funciona a avaliação de imóvel gratuita?',
+    answer: 'Preencha o formulário de avaliação informando os dados do seu imóvel e um de nossos corretores entrará em contato para uma avaliação profissional sem custo.',
+    link: '/avaliacao',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'faq-5',
+    question: 'Posso alugar um imóvel para pessoa jurídica?',
+    answer: 'Sim. Alugamos imóveis tanto para pessoas físicas quanto jurídicas, com contrato específico e condições personalizadas para o seu negócio.',
+    link: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];

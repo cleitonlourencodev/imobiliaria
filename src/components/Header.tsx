@@ -13,10 +13,10 @@ import {
   X, 
   PlusCircle,
   Lock,
-  Home,
-  Award,
-  Users
-} from 'lucide-react';
+   Home,
+   Award,
+   Info
+ } from 'lucide-react';
 import { useRealEstate } from '@/context/RealEstateContext';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
 
@@ -91,8 +91,8 @@ export default function Header() {
   const navLinks = [
     { name: 'Início', href: '/', icon: Home },
     { name: 'Imóveis', href: '/imoveis', icon: Building2 },
-    { name: 'Corretores', href: '/corretores', icon: Users },
     { name: 'Avaliar Imóvel', href: '/avaliacao', icon: Award },
+    { name: 'Sobre', href: '/sobre', icon: Info },
   ];
 
   const defaultSocialLinks = [

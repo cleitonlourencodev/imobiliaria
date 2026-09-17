@@ -23,9 +23,11 @@ import {
   Lock,
   MapPin,
   SlidersHorizontal,
-  Home,
-  Star
-} from 'lucide-react';
+   Home,
+   Star,
+   HelpCircle,
+   ExternalLink
+ } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
@@ -34,7 +36,7 @@ import LocationPickerMap from '@/components/LocationPickerMap';
 import BrokerCard from '@/components/BrokerCard';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'brokers' | 'leads' | 'valuations' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'brokers' | 'leads' | 'valuations' | 'settings' | 'faqs'>('overview');
 
   // Authenticated State Simulation
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -55,6 +57,10 @@ export default function AdminPage() {
   // Broker Modal State
   const [brokerModalOpen, setBrokerModalOpen] = useState(false);
   const [editingBroker, setEditingBroker] = useState<any | null>(null);
+
+  const [faqs, setFaqs] = useState<any[]>([]);
+  const [faqModalOpen, setFaqModalOpen] = useState(false);
+  const [editingFaq, setEditingFaq] = useState<any | null>(null);
 
   // Admin Search Filters
   const [propSearch, setPropSearch] = useState('');
@@ -88,6 +94,10 @@ export default function AdminPage() {
       if (lData.success) setLeads(lData.data);
       if (vData.success) setValuations(vData.data);
       if (sData.success) setSettings(sData.data);
+
+      const fRes = await fetch('/api/faq');
+      const fData = await fRes.json();
+      if (fData.success) setFaqs(fData.data);
     } catch (e) {
       console.error('Error loading admin data:', e);
     } finally {
@@ -119,6 +129,10 @@ export default function AdminPage() {
           if (lData.success) setLeads(lData.data);
           if (vData.success) setValuations(vData.data);
           if (sData.success) setSettings(sData.data);
+
+          const fRes = await fetch('/api/faq');
+          const fData = await fRes.json();
+          if (fData.success) setFaqs(fData.data);
         }
       } catch (e) {
         if (!cancelled) console.error('Error loading admin data:', e);
@@ -194,6 +208,21 @@ export default function AdminPage() {
       if (data.success) {
         setBrokers(prev => prev.filter(b => b.id !== brokerId));
         showAdminToast('Corretor removido.');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Delete FAQ Handler
+  const handleDeleteFaq = async (faqId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta pergunta?')) return;
+    try {
+      const res = await fetch(`/api/faq/${faqId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setFaqs(prev => prev.filter(f => f.id !== faqId));
+        showAdminToast('Pergunta excluída com sucesso.');
       }
     } catch (e) {
       console.error(e);
@@ -437,6 +466,21 @@ export default function AdminPage() {
           >
             <Settings className="w-4 h-4" />
             <span>Configurações do Site</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('faqs')}
+            className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center justify-between transition-all ${
+              activeTab === 'faqs' ? 'bg-amber-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800'
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <HelpCircle className="w-4 h-4" />
+              <span>Perguntas Frequentes</span>
+            </span>
+            <span className="bg-slate-950 text-amber-400 px-2 py-0.5 rounded-full text-[10px] font-mono">
+              {faqs.length}
+            </span>
           </button>
         </aside>
 
@@ -959,6 +1003,80 @@ export default function AdminPage() {
             </form>
           )}
 
+          {/* TAB 7: FAQ */}
+          {activeTab === 'faqs' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-black text-white">Perguntas Frequentes</h1>
+                  <p className="text-xs text-slate-400">Crie e gerencie as perguntas exibidas na página de ajuda do site.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingFaq(null);
+                    setFaqModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-2xl bg-amber-500 text-slate-950 text-xs font-bold flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Nova Pergunta</span>
+                </button>
+              </div>
+
+              {faqs.length === 0 ? (
+                <div className="text-center py-16 text-slate-400">
+                  <HelpCircle className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                  <p>Nenhuma pergunta frequente cadastrada. Clique em &quot;Nova Pergunta&quot; para começar.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {faqs.map((faq) => (
+                    <div key={faq.id} className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-3 shadow-xl">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm font-bold text-white break-words pr-2">{faq.question}</h3>
+                        <HelpCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">{faq.answer}</p>
+
+                      {faq.link ? (
+                        <div className="flex items-center gap-1.5">
+                          <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="text-[10px] text-slate-500">Link de solução:</span>
+                          <a
+                            href={faq.link}
+                            target={faq.link.startsWith('http') ? '_blank' : undefined}
+                            rel={faq.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                            className="text-xs text-emerald-400 hover:underline truncate"
+                          >
+                            {faq.link}
+                          </a>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-slate-500">Sem link de solução</span>
+                      )}
+
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={() => { setEditingFaq(faq); setFaqModalOpen(true); }}
+                          className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 hover:text-white flex items-center gap-1"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" /> Editar
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFaq(faq.id)}
+                          className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400 hover:bg-rose-500/20 flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Excluir
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
         </main>
       </div>
 
@@ -985,6 +1103,19 @@ export default function AdminPage() {
             setBrokerModalOpen(false);
             loadAllAdminData();
             showAdminToast('Corretor salvo com sucesso!');
+          }}
+        />
+      )}
+
+      {/* CREATE / EDIT FAQ MODAL */}
+      {faqModalOpen && (
+        <FaqModal
+          faq={editingFaq}
+          onClose={() => setFaqModalOpen(false)}
+          onSaved={() => {
+            setFaqModalOpen(false);
+            loadAllAdminData();
+            showAdminToast('Pergunta salva com sucesso!');
           }}
         />
       )}
@@ -1509,6 +1640,112 @@ function BrokerModal({ broker, onClose, onSaved }: { broker: any; onClose: () =>
             className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl transition-all"
           >
             {saving ? 'Salvando...' : 'Salvar Corretor'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+{/* FAQ Modal Component */}
+function FaqModal({ faq, onClose, onSaved }: { faq: any | null; onClose: () => void; onSaved: () => void }) {
+  const [formData, setFormData] = useState({
+    question: faq?.question || '',
+    answer: faq?.answer || '',
+    link: faq?.link || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      const url = faq ? `/api/faq/${faq.id}` : '/api/faq';
+      const method = faq ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        onSaved();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-6">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <h3 className="text-base font-bold text-white">
+            {faq ? 'Editar Pergunta' : 'Cadastrar Nova Pergunta'}
+          </h3>
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+          <div>
+            <label htmlFor="faq-question" className="font-semibold text-slate-300">Pergunta *</label>
+            <input
+              id="faq-question"
+              name="question"
+              type="text"
+              required
+              value={formData.question}
+              onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+              className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 mt-1"
+              placeholder="Digite a pergunta que os visitantes fazem..."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="faq-answer" className="font-semibold text-slate-300">Resposta *</label>
+            <textarea
+              id="faq-answer"
+              name="answer"
+              rows={4}
+              required
+              value={formData.answer}
+              onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+              className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2 mt-1"
+              placeholder="Digite a resposta completa..."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="faq-link" className="font-semibold text-slate-300 flex items-center gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+              Link de Solução (opcional)
+            </label>
+            <p className="text-[10px] text-slate-500 mt-0.5">
+              Caso a resposta precise direcionar o visitante para uma solução, adicione aqui um link (pode ser uma URL externa ou uma rota interna do site).
+            </p>
+            <input
+              id="faq-link"
+              name="link"
+              type="url"
+              value={formData.link}
+              onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+              className="w-full bg-slate-950 border border-slate-800 text-amber-400 font-mono font-bold rounded-xl px-3.5 py-2.5 mt-1"
+              placeholder="https://exemplo.com/solucao ou /rota-interna"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl transition-all"
+          >
+            {saving ? 'Salvando...' : 'Salvar Pergunta'}
           </button>
         </form>
       </div>
