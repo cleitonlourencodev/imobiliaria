@@ -81,8 +81,13 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserLocation({ lat, lng });
           setSearchCity('Sua Localização');
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.flyTo([lat, lng], 14, { duration: 1.5 });
+          }
         },
         () => {
           alert('Não foi possível obter sua localização. Verifique as permissões do navegador.');
@@ -230,6 +235,13 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     }
   }, [filteredProperties, getValidCoords]);
 
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    if (userLocation) {
+      mapInstanceRef.current.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 1.5 });
+    }
+  }, [userLocation]);
+
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-8">
       <div className="mb-6 space-y-3">
@@ -245,36 +257,40 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         </p>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center gap-3 mb-6 shadow-xl">
-        <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 font-semibold shrink-0">
-          <Filter className="w-4 h-4 text-amber-400" />
-          <span>Filtros:</span>
-        </div>
+      <div className="flex flex-col lg:flex-row gap-4 items-start">
+        {/* FILTER SIDEBAR */}
+        <div className="lg:w-72 shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+          <div className="bg-slate-950 rounded-xl p-3 border border-slate-800">
+            <div className="flex items-center gap-1.5 px-2 mb-3">
+              <Filter className="w-4 h-4 text-amber-400" />
+              <span className="text-xs text-slate-300 font-semibold">Filtros:</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => setMapFilter('todos')}
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${mapFilter === 'todos' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-300 border border-slate-800 hover:text-white'}`}
+              >Todos</button>
+              <button
+                onClick={() => setMapFilter('venda')}
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${mapFilter === 'venda' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-300 border border-slate-800 hover:text-white'}`}
+              >Vendas</button>
+              <button
+                onClick={() => setMapFilter('aluguel')}
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${mapFilter === 'aluguel' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-300 border border-slate-800 hover:text-white'}`}
+              >Aluguéis</button>
+              <button
+                onClick={() => setMapFilter('terreno')}
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${mapFilter === 'terreno' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-300 border border-slate-800 hover:text-white'}`}
+              >Terrenos & Lotes</button>
+            </div>
+          </div>
 
-        <button
-          onClick={() => setMapFilter('todos')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${mapFilter === 'todos' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-950 text-slate-300 border border-slate-800 hover:text-white'}`}
-        >Todos</button>
-        <button
-          onClick={() => setMapFilter('venda')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${mapFilter === 'venda' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-950 text-slate-300 border border-slate-800 hover:text-white'}`}
-        >Vendas</button>
-        <button
-          onClick={() => setMapFilter('aluguel')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${mapFilter === 'aluguel' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-950 text-slate-300 border border-slate-800 hover:text-white'}`}
-        >Aluguéis</button>
-        <button
-          onClick={() => setMapFilter('terreno')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${mapFilter === 'terreno' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-950 text-slate-300 border border-slate-800 hover:text-white'}`}
-        >Terrenos & Lotes</button>
-
-        <div className="flex items-center gap-2 ml-auto">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-2 bg-slate-950 rounded-xl p-2 border border-slate-800">
+            <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
             <select
               value={searchCity}
               onChange={(e) => setSearchCity(e.target.value)}
-              className="pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 text-white rounded-xl text-xs font-medium focus:outline-none focus:border-amber-500"
+              className="bg-transparent text-white text-xs font-medium focus:outline-none w-full"
             >
               <option value="São Paulo">São Paulo (Padrão)</option>
               {availableCities.map(city => (
@@ -285,42 +301,42 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
 
           <button
             onClick={detectUserLocation}
-            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20"
-            title="Centralizar no seu local"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20"
           >
             <Compass className="w-3.5 h-3.5" />
             <span>Minha Localização</span>
           </button>
+
+          <div className="pt-3 border-t border-slate-800 space-y-2">
+            <span className="text-[10px] text-slate-500 font-semibold">Categoria:</span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => setMapCategory('todos')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'todos' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
+              >Todos</button>
+              <button
+                onClick={() => setMapCategory('casa')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'casa' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
+              >Casas</button>
+              <button
+                onClick={() => setMapCategory('apartamento')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'apartamento' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
+              >Apartamentos</button>
+              <button
+                onClick={() => setMapCategory('terreno')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'terreno' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
+              >Terrenos</button>
+              <button
+                onClick={() => setMapCategory('cobertura')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'cobertura' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
+              >Coberturas</button>
+            </div>
+            <p className="text-[11px] text-slate-500 font-mono">{filteredProperties.length} imóvel(is)</p>
+          </div>
         </div>
 
-        <div className="w-full flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-          <span className="text-[10px] text-slate-500 font-semibold">Categoria:</span>
-          <button
-            onClick={() => setMapCategory('todos')}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'todos' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
-          >Todos</button>
-          <button
-            onClick={() => setMapCategory('casa')}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'casa' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
-          >Casas</button>
-          <button
-            onClick={() => setMapCategory('apartamento')}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'apartamento' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
-          >Apartamentos</button>
-          <button
-            onClick={() => setMapCategory('terreno')}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'terreno' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
-          >Terrenos</button>
-          <button
-            onClick={() => setMapCategory('cobertura')}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mapCategory === 'cobertura' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'}`}
-          >Coberturas</button>
-          <span className="ml-auto text-[11px] text-slate-500 font-mono">{filteredProperties.length} imóvel(is)</span>
-        </div>
-      </div>
-
-      <div className="relative w-full h-[580px] md:h-[720px] rounded-3xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
-        <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />
+        <div className="relative flex-1 h-[348px] md:h-[432px] rounded-3xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
+          <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />
 
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
           <div className="bg-slate-950/90 border border-amber-500/30 px-4 py-2.5 rounded-2xl backdrop-blur-md shadow-xl pointer-events-auto">
@@ -424,6 +440,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
             </Link>
           </div>
         )}
+      </div>
       </div>
     </section>
   );

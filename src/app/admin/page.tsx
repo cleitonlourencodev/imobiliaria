@@ -14,23 +14,24 @@ import {
   Edit3, 
   Trash2, 
   X, 
-  Search, 
-  Filter, 
-  Save, 
+  Search,
+  Filter,
+  Save,
   RefreshCw,
   ShieldCheck,
   CheckCircle2,
   Lock,
   MapPin,
-  Smartphone,
   SlidersHorizontal,
-  Home
+  Home,
+  Star
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
 import ImageUploader from '@/components/ImageUploader';
 import LocationPickerMap from '@/components/LocationPickerMap';
+import BrokerCard from '@/components/BrokerCard';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'brokers' | 'leads' | 'valuations' | 'settings'>('overview');
@@ -160,6 +161,24 @@ export default function AdminPage() {
       if (data.success) {
         setProperties(prev => prev.filter(p => p.id !== propId));
         showAdminToast('Imóvel excluído com sucesso.');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Quick Toggle Featured Handler for individual Property
+  const handleToggleFeatured = async (propId: string, currentVal: boolean) => {
+    try {
+      const res = await fetch(`/api/properties/${propId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ featured: !currentVal })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setProperties(prev => prev.map(p => p.id === propId ? { ...p, featured: !currentVal } : p));
+        showAdminToast(`Destaque ${!currentVal ? 'ATIVADO' : 'DESATIVADO'} para este imóvel!`);
       }
     } catch (e) {
       console.error(e);
@@ -589,6 +608,9 @@ export default function AdminPage() {
                             <div>
                               <div className="font-bold text-white line-clamp-1">{prop.title}</div>
                               <span className="text-[10px] text-amber-400 font-mono">Ref: {prop.code}</span>
+                              {prop.featured && (
+                                <span className="block text-[9px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">★ Destaque</span>
+                              )}
                             </div>
                           </td>
 
@@ -644,6 +666,18 @@ export default function AdminPage() {
                             </button>
 
                             <button
+                              onClick={() => handleToggleFeatured(prop.id, prop.featured)}
+                              className={`p-2 rounded-xl border transition-all ${
+                                prop.featured
+                                  ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                                  : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-amber-400'
+                              }`}
+                              title={prop.featured ? 'Remover destaque' : 'Marcar como destaque'}
+                            >
+                              <Star className={`w-4 h-4 ${prop.featured ? 'fill-amber-400' : ''}`} />
+                            </button>
+
+                            <button
                               onClick={() => handleDeleteProperty(prop.id)}
                               className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:text-rose-400"
                               title="Excluir"
@@ -683,43 +717,13 @@ export default function AdminPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {brokers.map((broker) => (
-                  <div key={broker.id} className="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4 flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-3">
-                          <img src={broker.photoUrl} alt={broker.name} className="w-14 h-14 rounded-2xl object-cover border border-amber-500 shrink-0" />
-                          <div>
-                            <h3 className="font-bold text-white text-sm">{broker.name}</h3>
-                            <span className="text-xs font-mono text-amber-400 font-bold">{broker.creci}</span>
-                            <div className="text-[11px] text-slate-400 mt-0.5">{broker.email}</div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteBroker(broker.id)}
-                          className="p-1.5 text-slate-500 hover:text-rose-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-1">
-                        <div className="text-slate-400 text-[10px]">WhatsApp Cadastrado para Recebimento de Leads:</div>
-                        <div className="font-mono font-bold text-emerald-400 flex items-center gap-1">
-                          <Smartphone className="w-3.5 h-3.5" /> {broker.whatsapp}
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setEditingBroker(broker);
-                        setBrokerModalOpen(true);
-                      }}
-                      className="w-full py-2 bg-slate-950 border border-slate-800 hover:border-amber-500 text-slate-300 hover:text-amber-400 text-xs font-bold rounded-xl"
-                    >
-                      Editar Dados do Corretor
-                    </button>
-                  </div>
+                  <BrokerCard
+                    key={broker.id}
+                    broker={broker}
+                    properties={properties}
+                    onEdit={(b) => { setEditingBroker(b); setBrokerModalOpen(true); }}
+                    onDelete={handleDeleteBroker}
+                  />
                 ))}
               </div>
             </div>
@@ -831,7 +835,7 @@ export default function AdminPage() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white">Solicitações de Avaliação de Imóvel</h1>
-                <p className="text-xs text-slate-400">Proprietários solicitando estimativas de venda/locação.</p>
+                <p className="text-xs text-slate-400">Proprietários solicitando avaliação de imóveis.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -850,7 +854,6 @@ export default function AdminPage() {
                     <div className="text-xs text-slate-300 space-y-1">
                       <p><strong>Tipo:</strong> {val.propertyType} — {val.estimatedArea} m² ({val.bedrooms} quartos)</p>
                       <p><strong>Local:</strong> {val.neighborhood}, {val.city}</p>
-                      <p><strong>Valor Estimado:</strong> <span className="text-emerald-400 font-mono font-bold">{formatCurrencyBRL(val.estimatedValue)}</span></p>
                     </div>
                   </div>
                 ))}
@@ -867,18 +870,6 @@ export default function AdminPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="settings-agencyName" className="text-xs font-semibold text-slate-300">Nome da Imobiliária</label>
-                  <input
-                    id="settings-agencyName"
-                    name="agencyName"
-                    type="text"
-                    value={settings.agencyName || ''}
-                    onChange={(e) => setSettings({ ...settings, agencyName: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs mt-1"
-                  />
-                </div>
-
                 <div>
                   <label htmlFor="settings-creci" className="text-xs font-semibold text-slate-300">CRECI da Agência</label>
                   <input
@@ -1327,18 +1318,6 @@ function PropertyModal({ property, brokers, onClose, onSaved }: { property: any;
                 className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 mt-1"
               />
             </div>
-          </div>
-
-          <div>
-            <label htmlFor="admin-prop-coverImage" className="font-semibold text-slate-300">URL da Imagem de Capa</label>
-            <input
-              id="admin-prop-coverImage"
-              name="coverImage"
-              type="text"
-              value={formData.coverImage}
-              onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 mt-1"
-            />
           </div>
 
           <div>

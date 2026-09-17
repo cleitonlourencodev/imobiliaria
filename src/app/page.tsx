@@ -154,7 +154,7 @@ export default function HomePage() {
           </div>
         ) : filteredProps.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProps.slice(0, 6).map((prop) => (
+            {filteredProps.filter(p => p.featured).map((prop) => (
               <PropertyCard key={prop.id} property={prop} featuredMode={prop.featured} />
             ))}
           </div>
@@ -170,109 +170,16 @@ export default function HomePage() {
             href="/imoveis"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500 text-amber-400 text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all shadow-xl"
           >
-            <span>Ver Todos os Imóveis ({properties.length})</span>
+            <span>Ver Todos os Imóveis</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
       </section>
 
-      {/* CATEGORIES GRID */}
-      <section className="py-16 px-4 sm:px-8 bg-slate-900/40 border-y border-slate-800">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">Ache seu Estilo</span>
-            <h2 className="text-3xl font-black text-white">Categorias em Destaque</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Link
-              href="/imoveis?category=casa"
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden border border-slate-800 hover:border-amber-500 transition-all"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=80"
-                alt="Casas de Condomínio"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 space-y-1">
-                <span className="text-xs text-amber-400 font-bold uppercase">Casas & Mansões</span>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
-                  Condomínios Fechados
-                </h3>
-              </div>
-            </Link>
-
-            <Link
-              href="/imoveis?category=terreno"
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden border border-slate-800 hover:border-amber-500 transition-all"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80"
-                alt="Terrenos e Lotes"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 space-y-1">
-                <span className="text-xs text-amber-400 font-bold uppercase">Loteamentos</span>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
-                  Terrenos & Lotes
-                </h3>
-              </div>
-            </Link>
-
-            <Link
-              href="/imoveis?category=cobertura"
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden border border-slate-800 hover:border-amber-500 transition-all"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80"
-                alt="Coberturas Duplex"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 space-y-1">
-                <span className="text-xs text-amber-400 font-bold uppercase">Vista Panorâmica</span>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
-                  Coberturas Duplex
-                </h3>
-              </div>
-            </Link>
-
-            <Link
-              href="/imoveis?type=aluguel"
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden border border-slate-800 hover:border-amber-500 transition-all"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80"
-                alt="Locação"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 space-y-1">
-                <span className="text-xs text-amber-400 font-bold uppercase">Locação Residencial</span>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
-                  Aluguéis Prontos
-                </h3>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* MAP SECTION */}
       <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto w-full space-y-6">
         <InteractiveModernMap properties={properties} />
-        <div className="flex items-center justify-end pt-2">
-          <Link
-            href="/mapa"
-            className="inline-flex items-center gap-1.5 text-xs text-amber-400 font-bold hover:underline"
-          >
-            <span>Abrir Mapa Completo & Interativo</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
       </section>
 
       {/* BROKERS TEAM SECTION */}
@@ -304,11 +211,7 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">
-                      {broker.activeListingsCount || 0} imóveis geridos
-                    </span>
-
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-end text-xs">
                     <a
                       href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20um%20atendimento%20imobili%C3%A1rio.`}
                       target="_blank"
@@ -337,10 +240,10 @@ export default function HomePage() {
                 Quer Vender ou Alugar seu Imóvel?
               </span>
               <h2 className="text-2xl sm:text-4xl font-black text-slate-950 leading-tight">
-                Descubra o valor real de mercado do seu imóvel com nossa Avaliação Inteligente
+                Avalie Seu Imóvel com Nossa Equipe Especializada
               </h2>
               <p className="text-sm font-medium text-slate-900/90 leading-relaxed max-w-2xl">
-                Anunciamos seu imóvel com fotos profissionais, tours virtuais e fazemos o direcionamento direto para compradores e locatários qualificados.
+                Solicite uma avaliação profissional e receba o acompanhamento de corretores credenciados para vender ou alugar seu imóvel.
               </p>
             </div>
 
@@ -350,7 +253,7 @@ export default function HomePage() {
                 className="py-4 px-6 rounded-2xl bg-slate-950 hover:bg-slate-900 text-amber-400 text-sm font-black text-center shadow-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2"
               >
                 <Award className="w-5 h-5 text-amber-400" />
-                <span>Simular Avaliação Grátis</span>
+                <span>Solicitar Avaliação</span>
               </Link>
             </div>
           </div>

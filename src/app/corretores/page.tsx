@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, Mail, Building2 } from 'lucide-react';
+import { Users, Mail } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
@@ -99,14 +99,8 @@ export default function BrokersPage() {
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-                    <Building2 className="w-4 h-4 text-amber-400" />
-                    <span>{broker.activeListingsCount || 0} imóveis</span>
-                  </div>
-
+                <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
                   <a
-                    href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20im%C3%B3veis.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg"

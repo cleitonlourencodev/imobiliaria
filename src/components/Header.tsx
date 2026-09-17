@@ -11,10 +11,9 @@ import {
   ShieldCheck, 
   Menu, 
   X, 
-  PlusCircle, 
+  PlusCircle,
   Lock,
   Home,
-  MapPin,
   Award,
   Users
 } from 'lucide-react';
@@ -92,9 +91,6 @@ export default function Header() {
   const navLinks = [
     { name: 'Início', href: '/', icon: Home },
     { name: 'Imóveis', href: '/imoveis', icon: Building2 },
-    { name: 'Venda', href: '/imoveis?type=venda', icon: MapPin },
-    { name: 'Aluguel', href: '/imoveis?type=aluguel', icon: Building2 },
-    { name: 'Terrenos', href: '/imoveis?category=terreno', icon: MapPin },
     { name: 'Corretores', href: '/corretores', icon: Users },
     { name: 'Avaliar Imóvel', href: '/avaliacao', icon: Award },
   ];

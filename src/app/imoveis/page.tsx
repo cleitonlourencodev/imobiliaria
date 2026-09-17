@@ -46,6 +46,20 @@ function PropertyListContent() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   useEffect(() => {
+    const newType = searchParams.get('type') || 'todos';
+    const newCategory = searchParams.get('category') || 'todos';
+    const newQ = searchParams.get('q') || '';
+    const newBedrooms = searchParams.get('bedrooms') || 'todos';
+    const newMaxPrice = searchParams.get('maxPrice') || '';
+
+    setType(newType);
+    setCategory(newCategory);
+    setQ(newQ);
+    setBedrooms(newBedrooms);
+    setMaxPrice(newMaxPrice);
+  }, [searchParams]);
+
+  useEffect(() => {
     async function fetchProperties() {
       try {
         setLoading(true);
