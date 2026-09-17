@@ -440,7 +440,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
             </Link>
           </div>
         )}
-      </div>
+       </div>
       </div>
     </section>
   );
