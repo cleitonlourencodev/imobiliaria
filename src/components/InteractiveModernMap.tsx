@@ -41,13 +41,14 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
   const [mapCategory, setMapCategory] = useState<string>('todos');
   const [selectedProp, setSelectedProp] = useState<MapPropertyItem | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [searchCity, setSearchCity] = useState('São Paulo');
+  const [searchCity, setSearchCity] = useState('todos');
 
   const [localProperties, setLocalProperties] = useState<MapPropertyItem[]>([]);
   const properties = propsFromParent && propsFromParent.length > 0 ? propsFromParent : localProperties;
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const userMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
   const leafletModuleRef = useRef<any>(null);
 
@@ -97,13 +98,30 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     }
   };
 
+  const distanceInKm = (from: { lat: number; lng: number }, to: { lat: number; lng: number }) => {
+    const earthRadiusKm = 6371;
+    const latDelta = (to.lat - from.lat) * Math.PI / 180;
+    const lngDelta = (to.lng - from.lng) * Math.PI / 180;
+    const fromLat = from.lat * Math.PI / 180;
+    const toLat = to.lat * Math.PI / 180;
+    const haversine = Math.sin(latDelta / 2) ** 2
+      + Math.cos(fromLat) * Math.cos(toLat) * Math.sin(lngDelta / 2) ** 2;
+
+    return 2 * earthRadiusKm * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  };
+
   const filteredProperties = useMemo(() => properties.filter(p => {
     const matchType = filterType ? (p.type === filterType || p.type === 'ambos') : true;
     const matchCategory = filterCategory ? p.category === filterCategory : true;
     const matchMapFilter = mapFilter === 'todos' ? true : (mapFilter === 'terreno' ? p.category === 'terreno' : (p.type === mapFilter || p.type === 'ambos'));
     const matchMapCat = mapCategory === 'todos' ? true : p.category === mapCategory;
-    return matchType && matchCategory && matchMapFilter && matchMapCat;
-  }), [properties, filterCategory, filterType, mapFilter, mapCategory]);
+    const matchCity = searchCity === 'todos' || p.city === searchCity;
+    const propertyLat = Number(p.latitude);
+    const propertyLng = Number(p.longitude);
+    const hasCoords = p.latitude != null && p.longitude != null && !isNaN(propertyLat) && !isNaN(propertyLng);
+    const matchNearby = !userLocation || (hasCoords && distanceInKm(userLocation, { lat: propertyLat, lng: propertyLng }) <= 50);
+    return matchType && matchCategory && matchMapFilter && matchMapCat && matchCity && matchNearby;
+  }), [properties, filterCategory, filterType, mapFilter, mapCategory, searchCity, userLocation]);
 
   const availableCities = Array.from(new Set(properties.map(p => p.city))).sort();
 
@@ -159,7 +177,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         const validCoords = getValidCoords();
         const center: [number, number] = validCoords.length > 0
           ? [Number(validCoords[0].latitude), Number(validCoords[0].longitude)]
-          : (userLocation ? [userLocation.lat, userLocation.lng] : [-23.5505, -46.6333]);
+          : [-23.5505, -46.6333];
 
         const map = (L.default).map(container, { attributionControl: false }).setView(center, 13);
 
@@ -204,6 +222,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
+      userMarkerRef.current = null;
       leafletLoadedRef.current = false;
       markersRef.current = [];
       if (container) {
@@ -211,7 +230,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         container.innerHTML = '';
       }
     };
-  }, [filteredProperties, userLocation, getValidCoords]);
+  }, [filteredProperties, getValidCoords]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !leafletModuleRef.current) return;
@@ -236,8 +255,18 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
   }, [filteredProperties, getValidCoords]);
 
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current || !leafletModuleRef.current) return;
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+
     if (userLocation) {
+      userMarkerRef.current = leafletModuleRef.current.circleMarker(
+        [userLocation.lat, userLocation.lng],
+        { radius: 9, color: '#ffffff', weight: 3, fillColor: '#10b981', fillOpacity: 1 }
+      ).addTo(mapInstanceRef.current);
       mapInstanceRef.current.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 1.5 });
     }
   }, [userLocation]);
@@ -289,10 +318,13 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
             <select
               value={searchCity}
-              onChange={(e) => setSearchCity(e.target.value)}
+              onChange={(e) => {
+                setSearchCity(e.target.value);
+                setUserLocation(null);
+              }}
               className="bg-transparent text-white text-xs font-medium focus:outline-none w-full"
             >
-              <option value="São Paulo">São Paulo (Padrão)</option>
+              <option value="todos">Todas as cidades</option>
               {availableCities.map(city => (
                 <option key={city} value={city}>{city}</option>
               ))}
