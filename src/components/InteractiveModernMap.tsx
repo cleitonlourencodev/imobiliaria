@@ -85,7 +85,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           setUserLocation({ lat, lng });
-          setSearchCity('Sua Localização');
+          setSearchCity('todos');
           if (mapInstanceRef.current) {
             mapInstanceRef.current.flyTo([lat, lng], 14, { duration: 1.5 });
           }
