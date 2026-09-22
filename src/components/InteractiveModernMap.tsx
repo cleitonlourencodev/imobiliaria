@@ -78,7 +78,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     };
   }, [propsFromParent]);
 
-  const detectUserLocation = () => {
+  const detectUserLocation = useCallback(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -96,7 +96,11 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         { timeout: 8000, maximumAge: 60000 }
       );
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    detectUserLocation();
+  }, [detectUserLocation]);
 
   const distanceInKm = (from: { lat: number; lng: number }, to: { lat: number; lng: number }) => {
     const earthRadiusKm = 6371;
@@ -175,11 +179,13 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         (L.default as any).Marker.prototype.options.icon = defaultIcon;
 
         const validCoords = getValidCoords();
-        const center: [number, number] = validCoords.length > 0
+        const center: [number, number] = userLocation
+          ? [userLocation.lat, userLocation.lng]
+          : validCoords.length > 0
           ? [Number(validCoords[0].latitude), Number(validCoords[0].longitude)]
           : [-23.5505, -46.6333];
 
-        const map = (L.default).map(container, { attributionControl: false }).setView(center, 13);
+        const map = (L.default).map(container, { attributionControl: false }).setView(center, userLocation ? 14 : 13);
 
         (L.default).tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',
@@ -197,7 +203,9 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
             return marker;
           });
 
-          if (validCoords.length > 1) {
+          if (userLocation) {
+            map.setView([userLocation.lat, userLocation.lng], 14, { animate: false });
+          } else if (validCoords.length > 1) {
             const group = new (L.default as any).featureGroup(markersRef.current);
             map.fitBounds(group.getBounds().pad(0.15), { animate: false, maxZoom: 16 });
           }
@@ -209,6 +217,13 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         if (!cancelled) {
           mapInstanceRef.current = map;
           leafletLoadedRef.current = true;
+
+          if (userLocation) {
+            userMarkerRef.current = (L.default as any).circleMarker(
+              [userLocation.lat, userLocation.lng],
+              { radius: 9, color: '#ffffff', weight: 3, fillColor: '#10b981', fillOpacity: 1 }
+            ).addTo(map);
+          }
         }
       }).catch(err => {
         console.error('Leaflet load error:', err);
@@ -230,7 +245,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         container.innerHTML = '';
       }
     };
-  }, [filteredProperties, getValidCoords]);
+  }, [filteredProperties, getValidCoords, userLocation]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !leafletModuleRef.current) return;
@@ -242,7 +257,9 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
         .on('click', () => setSelectedProp(prop));
       return marker;
     });
-    if (validCoords.length > 1) {
+    if (userLocation) {
+      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 14);
+    } else if (validCoords.length > 1) {
       setTimeout(() => {
         if (!mapInstanceRef.current || !leafletModuleRef.current) return;
         mapInstanceRef.current.invalidateSize();
@@ -252,7 +269,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     } else if (validCoords.length === 1) {
       mapInstanceRef.current.setView([Number(validCoords[0].latitude), Number(validCoords[0].longitude)] as [number, number], 14);
     }
-  }, [filteredProperties, getValidCoords]);
+  }, [filteredProperties, getValidCoords, userLocation]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !leafletModuleRef.current) return;
