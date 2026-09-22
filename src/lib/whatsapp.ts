@@ -1,5 +1,6 @@
 export interface PropertyWhatsAppTarget {
   whatsappDirectEnabled: boolean;
+  workWithBrokers?: boolean;
   brokerName?: string | null;
   brokerWhatsapp?: string | null;
   agencyWhatsapp: string;
@@ -44,7 +45,7 @@ export function buildWhatsAppLink(target: PropertyWhatsAppTarget, payload: LeadP
   isDirectToBroker: boolean;
   formattedMessage: string;
 } {
-  const isDirectToBroker = Boolean(target.whatsappDirectEnabled && target.brokerWhatsapp);
+  const isDirectToBroker = Boolean(target.workWithBrokers !== false && target.whatsappDirectEnabled && target.brokerWhatsapp);
   const rawNumber = isDirectToBroker && target.brokerWhatsapp ? target.brokerWhatsapp : target.agencyWhatsapp;
   const recipientPhone = cleanPhoneForWhatsApp(rawNumber);
   const recipientName = isDirectToBroker && target.brokerName ? target.brokerName : 'Central de Atendimento Prime';

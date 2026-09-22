@@ -16,6 +16,7 @@ export async function PUT(req: NextRequest) {
     if (body.creci !== undefined) updatePayload.creci = body.creci;
     if (body.phone !== undefined) updatePayload.phone = body.phone;
     if (body.whatsappDefault !== undefined) updatePayload.whatsappDefault = body.whatsappDefault;
+    if (body.workWithBrokers !== undefined) updatePayload.workWithBrokers = Boolean(body.workWithBrokers);
     if (body.email !== undefined) updatePayload.email = body.email;
     if (body.address !== undefined) updatePayload.address = body.address;
     if (body.heroTitle !== undefined) updatePayload.heroTitle = body.heroTitle;

@@ -343,6 +343,7 @@ export const mockSettings = {
   creci: 'CRECI 45.892-J',
   phone: '(11) 3890-4000',
   whatsappDefault: '5511998887777',
+  workWithBrokers: true,
   email: 'contato@primeimoveis.com.br',
   address: 'Av. Brigadeiro Faria Lima, 2200 - Itaim Bibi, São Paulo - SP',
   heroTitle: 'Encontre o imóvel ideal para seu estilo de vida',

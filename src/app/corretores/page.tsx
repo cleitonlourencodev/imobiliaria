@@ -9,16 +9,24 @@ import WhatsappIcon from '@/components/icons/WhatsappIcon';
 
 export default function BrokersPage() {
   const [brokers, setBrokers] = useState<any[]>([]);
+  const [workWithBrokers, setWorkWithBrokers] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadBrokers() {
       try {
         setLoading(true);
-        const res = await fetch('/api/brokers');
+        const [res, settingsRes] = await Promise.all([
+          fetch('/api/brokers'),
+          fetch('/api/settings')
+        ]);
         const data = await res.json();
+        const settingsData = await settingsRes.json();
         if (data.success) {
           setBrokers(data.data);
+        }
+        if (settingsData.success) {
+          setWorkWithBrokers(settingsData.data.workWithBrokers !== false);
         }
       } catch (e) {
         console.error(e);
@@ -53,6 +61,13 @@ export default function BrokersPage() {
             {[1, 2, 3].map((n) => (
               <div key={n} className="h-80 rounded-3xl bg-slate-900 animate-pulse border border-slate-800" />
             ))}
+          </div>
+        ) : !workWithBrokers ? (
+          <div className="max-w-xl mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-3">
+            <Users className="w-10 h-10 text-amber-400 mx-auto" />
+            <h2 className="text-xl font-bold text-white">Atendimento centralizado</h2>
+            <p className="text-sm text-slate-400">Nossa equipe da imobiliária está pronta para atender você e apresentar as melhores opções.</p>
+            <Link href="/" className="inline-flex px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Falar com a imobiliária</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -101,6 +116,7 @@ export default function BrokersPage() {
 
                 <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
                   <a
+                    href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg"

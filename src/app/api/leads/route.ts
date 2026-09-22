@@ -71,15 +71,16 @@ export async function POST(req: NextRequest) {
 
     let whatsappInfo = null;
     if (propertyObj) {
-      const cleanPhone = brokerObj?.whatsapp || settings.whatsappDefault;
+        const useBrokerContact = settings.workWithBrokers && whatsappDirectEnabled && Boolean(brokerObj?.whatsapp);
+        const cleanPhone = useBrokerContact ? brokerObj!.whatsapp : settings.whatsappDefault;
       const text = encodeURIComponent(
         `Olá! Tenho interesse no imóvel *${propertyObj.title}* (Cód: *${propertyObj.code}*), no valor de *R$ ${Number(propertyObj.price).toLocaleString('pt-BR')}*. Gostaria de mais informações!`
       );
       whatsappInfo = {
         url: `https://wa.me/${cleanPhone.replace(/\D/g, '')}?text=${text}`,
         recipientPhone: cleanPhone,
-        recipientName: brokerObj?.name || settings.agencyName,
-        isDirectToBroker: Boolean(brokerObj?.whatsapp),
+        recipientName: useBrokerContact ? brokerObj!.name : settings.agencyName,
+        isDirectToBroker: useBrokerContact,
         formattedMessage: message || 'Contato sobre imóvel'
       };
     } else {

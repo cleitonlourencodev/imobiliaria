@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockProperties } from '@/lib/mock-data';
+import { mockProperties, mockSettings } from '@/lib/mock-data';
 
 export async function GET(req: NextRequest) {
   try {
@@ -93,7 +93,11 @@ export async function GET(req: NextRequest) {
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
-    return NextResponse.json({ success: true, count: filtered.length, data: filtered });
+    const data = mockSettings.workWithBrokers
+      ? filtered
+      : filtered.map(({ broker, ...property }) => ({ ...property, broker: null }));
+
+    return NextResponse.json({ success: true, count: data.length, data });
   } catch (error) {
     console.error('Error fetching properties:', error);
     return NextResponse.json({ success: false, error: 'Failed to fetch properties' }, { status: 500 });

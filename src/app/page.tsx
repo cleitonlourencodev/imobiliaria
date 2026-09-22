@@ -30,6 +30,7 @@ import { formatCurrencyBRL } from '@/lib/whatsapp';
 export default function HomePage() {
   const [properties, setProperties] = useState<PropertyItem[]>([]);
   const [brokers, setBrokers] = useState<any[]>([]);
+  const [workWithBrokers, setWorkWithBrokers] = useState(true);
   const [loading, setLoading] = useState(true);
   const [activeTypeFilter, setActiveTypeFilter] = useState<string>('todos');
 
@@ -37,15 +38,18 @@ export default function HomePage() {
     async function loadData() {
       try {
         setLoading(true);
-        const [pRes, bRes] = await Promise.all([
+        const [pRes, bRes, sRes] = await Promise.all([
           fetch('/api/properties'),
-          fetch('/api/brokers')
+          fetch('/api/brokers'),
+          fetch('/api/settings')
         ]);
         const pData = await pRes.json();
         const bData = await bRes.json();
+        const sData = await sRes.json();
 
         if (pData.success) setProperties(pData.data);
         if (bData.success) setBrokers(bData.data);
+        if (sData.success) setWorkWithBrokers(sData.data.workWithBrokers !== false);
       } catch (e) {
         console.error('Error loading homepage data:', e);
       } finally {
@@ -215,17 +219,19 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-end text-xs">
-                    <a
-                      href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20um%20atendimento%20imobili%C3%A1rio.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md"
-                    >
-                      <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
-                      <span>WhatsApp</span>
-                    </a>
-                  </div>
+                  {workWithBrokers && (
+                    <div className="pt-3 border-t border-slate-800/80 flex items-center justify-end text-xs">
+                      <a
+                        href={`https://wa.me/${broker.whatsapp.replace(/\D/g, '')}?text=Ol%C3%A1%20${encodeURIComponent(broker.name)}!%20Gostaria%20de%20um%20atendimento%20imobili%C3%A1rio.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      >
+                        <WhatsappIcon className="w-3.5 h-3.5 fill-white" />
+                        <span>WhatsApp</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

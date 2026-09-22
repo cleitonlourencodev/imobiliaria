@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockProperties, mockBrokers } from '@/lib/mock-data';
+import { mockProperties, mockBrokers, mockSettings } from '@/lib/mock-data';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     prop.viewsCount += 1;
 
     let brokerData = null;
-    if (prop.brokerId) {
+    if (mockSettings.workWithBrokers && prop.brokerId) {
       brokerData = mockBrokers.find(b => b.id === prop.brokerId) || null;
     }
 

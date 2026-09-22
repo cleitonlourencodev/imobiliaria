@@ -115,6 +115,7 @@ export const siteSettings = pgTable('site_settings', {
   creci: text('creci').notNull().default('CRECI 45.892-J'),
   phone: text('phone').notNull().default('(11) 3890-4000'),
   whatsappDefault: text('whatsapp_default').notNull().default('5511998887777'),
+  workWithBrokers: boolean('work_with_brokers').notNull().default(true),
   email: text('email').notNull().default('contato@primeimoveis.com.br'),
   address: text('address').notNull().default('Av. Brigadeiro Faria Lima, 2200 - Itaim Bibi, São Paulo - SP'),
   

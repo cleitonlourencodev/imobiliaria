@@ -914,6 +914,25 @@ export default function AdminPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2 p-4 rounded-2xl bg-slate-950 border border-amber-500/30">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      id="settings-workWithBrokers"
+                      name="workWithBrokers"
+                      type="checkbox"
+                      checked={settings.workWithBrokers !== false}
+                      onChange={(e) => setSettings({ ...settings, workWithBrokers: e.target.checked })}
+                      className="mt-0.5 h-4 w-4 accent-amber-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-bold text-white">Trabalhar pelos corretores</span>
+                      <span className="block text-xs text-slate-400 mt-1">
+                        Quando desativado, os contatos dos imóveis serão direcionados para o WhatsApp da imobiliária e os corretores não serão exibidos nos imóveis.
+                      </span>
+                    </span>
+                  </label>
+                </div>
+
                 <div>
                   <label htmlFor="settings-creci" className="text-xs font-semibold text-slate-300">CRECI da Agência</label>
                   <input
@@ -1378,7 +1397,7 @@ function PropertyModal({ property, brokers, onClose, onSaved }: { property: any;
               />
             </div>
             <p className="text-[11px] text-slate-400 leading-normal">
-              Quando esta opção estiver <strong className="text-white">ativada</strong>, ao internauta cliente manifestar interesse por este imóvel, o corretor responsável selecionado acima receberá automaticamente em seu WhatsApp os dados completos.
+              Quando esta opção estiver <strong className="text-white">ativada</strong> e o atendimento por corretores também estiver ativo nas configurações globais, o corretor responsável receberá automaticamente os dados completos no WhatsApp.
             </p>
           </div>
 

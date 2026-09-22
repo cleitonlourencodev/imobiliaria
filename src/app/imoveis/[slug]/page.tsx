@@ -38,6 +38,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
   const [property, setProperty] = useState<PropertyItem | null>(null);
   const [similarProps, setSimilarProps] = useState<PropertyItem[]>([]);
+  const [workWithBrokers, setWorkWithBrokers] = useState(true);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState<string>('');
 
@@ -55,8 +56,15 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
     async function loadProperty() {
       try {
         setLoading(true);
-        const res = await fetch(`/api/properties/${slug}`);
+        const [res, settingsRes] = await Promise.all([
+          fetch(`/api/properties/${slug}`, { cache: 'no-store' }),
+          fetch('/api/settings', { cache: 'no-store' })
+        ]);
         const data = await res.json();
+        const settingsData = await settingsRes.json();
+        if (settingsData.success) {
+          setWorkWithBrokers(settingsData.data.workWithBrokers !== false);
+        }
         if (data.success && data.data) {
           setProperty(data.data);
           setActiveImage(data.data.coverImage);
@@ -108,6 +116,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
   const favorited = isFavorite(property.id);
   const compared = isInCompare(property.id);
+  const displayedBroker = workWithBrokers ? property.broker : null;
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -407,10 +416,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
             {/* BROKER RESPONSIBLE BADGE CARD */}
             <div className="bg-slate-900 border-2 border-amber-500/40 p-6 rounded-3xl space-y-5 shadow-2xl relative">
               <div className="flex items-center gap-4 border-b border-slate-800 pb-4">
-                {property.broker ? (
+                {displayedBroker ? (
                   <img
-                    src={property.broker.photoUrl}
-                    alt={property.broker.name}
+                    src={displayedBroker.photoUrl}
+                    alt={displayedBroker.name}
                     className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-500 shadow-md"
                   />
                 ) : (
@@ -421,13 +430,13 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
                 <div>
                   <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">
-                    Corretor Responsável
+                    {displayedBroker ? 'Corretor Responsável' : 'Atendimento da Imobiliária'}
                   </span>
                   <h4 className="text-base font-bold text-white">
-                    {property.broker ? property.broker.name : 'Central Prime Imóveis'}
+                    {displayedBroker ? displayedBroker.name : 'Central Prime Imóveis'}
                   </h4>
                   <span className="text-xs font-mono text-slate-400">
-                    {property.broker ? property.broker.creci : 'CRECI 45.892-J'}
+                    {displayedBroker ? displayedBroker.creci : 'CRECI 45.892-J'}
                   </span>
                 </div>
               </div>
@@ -552,7 +561,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
                   className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
                 >
                   <WhatsappIcon className="w-4 h-4 fill-white" />
-                  <span>{submitting ? 'Gerando Notificação...' : 'Falar no WhatsApp com o Corretor'}</span>
+                  <span>{submitting ? 'Gerando Notificação...' : displayedBroker ? 'Falar no WhatsApp com o Corretor' : 'Falar no WhatsApp com a Imobiliária'}</span>
                 </button>
               </form>
 
