@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { 
   Building2, 
   Sparkles, 
-  Zap, 
   CheckCircle2, 
   ArrowRight, 
   Award, 
@@ -68,21 +67,26 @@ export default function HomePage() {
       <Header />
 
       {/* HERO SECTION */}
-      <section className="relative pt-12 pb-24 px-4 sm:px-8 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+      <section className="relative pt-16 pb-28 px-4 sm:px-8 overflow-hidden bg-slate-950 min-h-[640px]">
+        {/* Beautiful luxury house background image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&auto=format&fit=crop&q=80')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+          aria-hidden="true"
+        />
+        {/* Dark overlay so the headline and search remain legible */}
+        <div className="absolute inset-0 bg-slate-950/60" />
+
         {/* Glow Effects */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-1/3 left-1/4 w-[400px] h-[250px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="max-w-7xl mx-auto text-center space-y-6 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 border border-amber-500/30 text-amber-400 text-xs font-bold shadow-lg shadow-amber-500/10 backdrop-blur-md">
-            <Zap className="w-4 h-4 fill-amber-400 text-amber-400 animate-pulse" />
-            <span>Atendimento WhatsApp Direto ao Corretor Responsável</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
-            Encontre o imóvel dos seus sonhos com <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 bg-clip-text text-transparent">agilidade & exclusividade</span>
-          </h1>
-
           <p className="text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
             Casas em condomínio, coberturas duplex, terrenos e aluguéis de alto padrão nas localizações mais cobiçadas do mercado.
           </p>
