@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
     const bathrooms = searchParams.get('bathrooms');
     const parkingSpaces = searchParams.get('parkingSpaces');
     const city = searchParams.get('city');
+    const state = searchParams.get('state');
     const neighborhood = searchParams.get('neighborhood');
     const featured = searchParams.get('featured');
     const status = searchParams.get('status');
@@ -55,6 +56,10 @@ export async function GET(req: NextRequest) {
     if (parkingSpaces && parkingSpaces !== 'todos') {
       const pNum = parseInt(parkingSpaces, 10);
       if (!isNaN(pNum)) filtered = filtered.filter(p => p.parkingSpaces >= pNum);
+    }
+
+    if (state && state !== 'todos') {
+      filtered = filtered.filter(p => p.state.toLowerCase().includes(state.toLowerCase()));
     }
 
     if (city && city !== 'todos') {

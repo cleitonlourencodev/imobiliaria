@@ -2,24 +2,31 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Search, 
-  MapPin, 
-  Building2, 
-  DollarSign, 
-  Bed, 
+import {
+  Search,
+  MapPin,
+  Building2,
+  DollarSign,
+  Bed,
   Sparkles,
   Filter
 } from 'lucide-react';
+import { mockProperties } from '@/lib/mock-data';
+import LocationCombobox from '@/components/LocationCombobox';
+
+const STATES = Array.from(new Set(mockProperties.map((p) => p.state))).filter(Boolean).sort();
+const CITIES = Array.from(new Set(mockProperties.map((p) => p.city))).filter(Boolean).sort();
+const NEIGHBORHOODS = Array.from(new Set(mockProperties.map((p) => p.neighborhood))).filter(Boolean).sort();
 
 export default function HeroSearch() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'todos' | 'venda' | 'aluguel' | 'terreno'>('todos');
   const [category, setCategory] = useState<string>('todos');
-  const [q, setQ] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [neighborhood, setNeighborhood] = useState<string>('');
   const [bedrooms, setBedrooms] = useState<string>('todos');
   const [maxPrice, setMaxPrice] = useState<string>('');
-  const [code, setCode] = useState<string>('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +42,16 @@ export default function HeroSearch() {
       params.set('category', category);
     }
 
-    if (q.trim()) {
-      params.set('q', q.trim());
+    if (state.trim()) {
+      params.set('state', state.trim());
+    }
+
+    if (city.trim()) {
+      params.set('city', city.trim());
+    }
+
+    if (neighborhood.trim()) {
+      params.set('neighborhood', neighborhood.trim());
     }
 
     if (bedrooms !== 'todos') {
@@ -45,10 +60,6 @@ export default function HeroSearch() {
 
     if (maxPrice.trim()) {
       params.set('maxPrice', maxPrice.trim());
-    }
-
-    if (code.trim()) {
-      params.set('q', code.trim());
     }
 
     router.push(`/imoveis?${params.toString()}`);
@@ -112,26 +123,58 @@ export default function HeroSearch() {
         onSubmit={handleSearch}
         className="bg-slate-950/90 border-x border-b border-slate-800 p-4 sm:p-6 rounded-b-3xl shadow-2xl backdrop-blur-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
       >
-        {/* Field 1: Localização / Bairro / Cidade */}
+        {/* Field 1: Estado */}
         <div className="space-y-1.5 lg:col-span-1">
-          <label htmlFor="search-q" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+          <label htmlFor="search-state" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-amber-400" />
-            <span>Localização / Bairro</span>
+            <span>Estado</span>
           </label>
-          <div className="relative">
-            <input
-              id="search-q"
-              name="q"
-              type="text"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Ex: Alphaville, Itaim, Pinheiros..."
-              className="w-full bg-slate-900 border border-slate-800 focus:border-amber-500 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none transition-all placeholder:text-slate-500"
-            />
-          </div>
+          <LocationCombobox
+            id="search-state"
+            value={state}
+            onChange={setState}
+            options={STATES}
+            placeholder="Ex: SP"
+            className="bg-slate-900 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+            inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+          />
         </div>
 
-        {/* Field 2: Tipo de Imóvel */}
+        {/* Field 3: Cidade */}
+        <div className="space-y-1.5 lg:col-span-1">
+          <label htmlFor="search-city" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-amber-400" />
+            <span>Cidade</span>
+          </label>
+          <LocationCombobox
+            id="search-city"
+            value={city}
+            onChange={setCity}
+            options={CITIES}
+            placeholder="Ex: São Paulo"
+            className="bg-slate-900 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+            inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+          />
+        </div>
+
+        {/* Field 4: Bairro */}
+        <div className="space-y-1.5 lg:col-span-1">
+          <label htmlFor="search-neighborhood" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-amber-400" />
+            <span>Bairro</span>
+          </label>
+          <LocationCombobox
+            id="search-neighborhood"
+            value={neighborhood}
+            onChange={setNeighborhood}
+            options={NEIGHBORHOODS}
+            placeholder="Ex: Pinheiros"
+            className="bg-slate-900 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+            inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+          />
+        </div>
+
+        {/* Field 5: Tipo de Imóvel */}
         <div className="space-y-1.5 lg:col-span-1">
           <label htmlFor="search-category" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
             <Building2 className="w-3.5 h-3.5 text-amber-400" />

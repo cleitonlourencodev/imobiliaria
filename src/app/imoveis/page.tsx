@@ -23,7 +23,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PropertyCard from '@/components/PropertyCard';
 import InteractiveMap from '@/components/InteractiveMap';
+import LocationCombobox from '@/components/LocationCombobox';
 import { PropertyItem } from '@/context/RealEstateContext';
+import { mockProperties } from '@/lib/mock-data';
+
+const STATES = Array.from(new Set(mockProperties.map((p) => p.state))).filter(Boolean).sort();
+const CITIES = Array.from(new Set(mockProperties.map((p) => p.city))).filter(Boolean).sort();
+const NEIGHBORHOODS = Array.from(new Set(mockProperties.map((p) => p.neighborhood))).filter(Boolean).sort();
 
 function PropertyListContent() {
   const searchParams = useSearchParams();
@@ -36,6 +42,9 @@ function PropertyListContent() {
   const [type, setType] = useState<string>(searchParams.get('type') || 'todos');
   const [category, setCategory] = useState<string>(searchParams.get('category') || 'todos');
   const [q, setQ] = useState<string>(searchParams.get('q') || '');
+  const [state, setState] = useState<string>(searchParams.get('state') || '');
+  const [city, setCity] = useState<string>(searchParams.get('city') || '');
+  const [neighborhood, setNeighborhood] = useState<string>(searchParams.get('neighborhood') || '');
   const [bedrooms, setBedrooms] = useState<string>(searchParams.get('bedrooms') || 'todos');
   const [bathrooms, setBathrooms] = useState<string>('todos');
   const [parkingSpaces, setParkingSpaces] = useState<string>('todos');
@@ -49,12 +58,18 @@ function PropertyListContent() {
     const newType = searchParams.get('type') || 'todos';
     const newCategory = searchParams.get('category') || 'todos';
     const newQ = searchParams.get('q') || '';
+    const newState = searchParams.get('state') || '';
+    const newCity = searchParams.get('city') || '';
+    const newNeighborhood = searchParams.get('neighborhood') || '';
     const newBedrooms = searchParams.get('bedrooms') || 'todos';
     const newMaxPrice = searchParams.get('maxPrice') || '';
 
     setType(newType);
     setCategory(newCategory);
     setQ(newQ);
+    setState(newState);
+    setCity(newCity);
+    setNeighborhood(newNeighborhood);
     setBedrooms(newBedrooms);
     setMaxPrice(newMaxPrice);
   }, [searchParams]);
@@ -68,6 +83,9 @@ function PropertyListContent() {
         if (type !== 'todos') params.set('type', type);
         if (category !== 'todos') params.set('category', category);
         if (q.trim()) params.set('q', q.trim());
+        if (state.trim()) params.set('state', state.trim());
+        if (city.trim()) params.set('city', city.trim());
+        if (neighborhood.trim()) params.set('neighborhood', neighborhood.trim());
         if (bedrooms !== 'todos') params.set('bedrooms', bedrooms);
         if (bathrooms !== 'todos') params.set('bathrooms', bathrooms);
         if (parkingSpaces !== 'todos') params.set('parkingSpaces', parkingSpaces);
@@ -87,12 +105,15 @@ function PropertyListContent() {
       }
     }
     fetchProperties();
-  }, [type, category, q, bedrooms, bathrooms, parkingSpaces, minPrice, maxPrice, sort]);
+  }, [type, category, q, state, city, neighborhood, bedrooms, bathrooms, parkingSpaces, minPrice, maxPrice, sort]);
 
   const clearFilters = () => {
     setType('todos');
     setCategory('todos');
     setQ('');
+    setState('');
+    setCity('');
+    setNeighborhood('');
     setBedrooms('todos');
     setBathrooms('todos');
     setParkingSpaces('todos');
@@ -199,6 +220,50 @@ function PropertyListContent() {
                   className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 text-white text-xs rounded-xl px-3.5 py-2.5 focus:outline-none"
                 />
               </div>
+            </div>
+
+            {/* Location Filters */}
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold text-slate-300">Localização</span>
+              </div>
+               <div className="space-y-1.5">
+                 <label htmlFor="filter-state" className="text-[11px] text-slate-400">Estado</label>
+                 <LocationCombobox
+                   id="filter-state"
+                   value={state}
+                   onChange={setState}
+                   options={STATES}
+                   placeholder="Ex: SP ou São Paulo"
+                   className="bg-slate-950 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+                   inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+                 />
+               </div>
+               <div className="space-y-1.5">
+                 <label htmlFor="filter-city" className="text-[11px] text-slate-400">Cidade</label>
+                 <LocationCombobox
+                   id="filter-city"
+                   value={city}
+                   onChange={setCity}
+                   options={CITIES}
+                   placeholder="Ex: São Paulo"
+                   className="bg-slate-950 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+                   inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+                 />
+               </div>
+               <div className="space-y-1.5">
+                 <label htmlFor="filter-neighborhood" className="text-[11px] text-slate-400">Bairro</label>
+                 <LocationCombobox
+                   id="filter-neighborhood"
+                   value={neighborhood}
+                   onChange={setNeighborhood}
+                   options={NEIGHBORHOODS}
+                   placeholder="Ex: Pinheiros"
+                   className="bg-slate-950 border border-slate-800 rounded-xl focus-within:border-amber-500 px-3.5 py-2.5 gap-1"
+                   inputClassName="flex-1 bg-transparent text-white text-xs focus:outline-none placeholder:text-slate-500"
+                 />
+               </div>
             </div>
 
             {/* Type */}

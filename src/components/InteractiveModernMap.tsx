@@ -8,6 +8,7 @@ import {
   Search, Compass, MapPin, X, LocateFixed, Globe
 } from 'lucide-react';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
+import LocationCombobox from '@/components/LocationCombobox';
 
 export interface MapPropertyItem {
   id: string;
@@ -41,7 +42,9 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
   const [mapCategory, setMapCategory] = useState<string>('todos');
   const [selectedProp, setSelectedProp] = useState<MapPropertyItem | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchState, setSearchState] = useState('');
   const [searchCity, setSearchCity] = useState('todos');
+  const [searchNeighborhood, setSearchNeighborhood] = useState('');
 
   const [localProperties, setLocalProperties] = useState<MapPropertyItem[]>([]);
   const properties = propsFromParent && propsFromParent.length > 0 ? propsFromParent : localProperties;
@@ -85,7 +88,9 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           setUserLocation({ lat, lng });
+          setSearchState('');
           setSearchCity('todos');
+          setSearchNeighborhood('');
           if (mapInstanceRef.current) {
             mapInstanceRef.current.flyTo([lat, lng], 14, { duration: 1.5 });
           }
@@ -119,15 +124,19 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
     const matchCategory = filterCategory ? p.category === filterCategory : true;
     const matchMapFilter = mapFilter === 'todos' ? true : (mapFilter === 'terreno' ? p.category === 'terreno' : (p.type === mapFilter || p.type === 'ambos'));
     const matchMapCat = mapCategory === 'todos' ? true : p.category === mapCategory;
-    const matchCity = searchCity === 'todos' || p.city === searchCity;
+    const matchState = !searchState.trim() || p.state.toLowerCase().includes(searchState.trim().toLowerCase());
+    const matchCity = searchCity === 'todos' || p.city.toLowerCase().includes(searchCity.trim().toLowerCase());
+    const matchNeighborhood = !searchNeighborhood.trim() || p.neighborhood.toLowerCase().includes(searchNeighborhood.trim().toLowerCase());
     const propertyLat = Number(p.latitude);
     const propertyLng = Number(p.longitude);
     const hasCoords = p.latitude != null && p.longitude != null && !isNaN(propertyLat) && !isNaN(propertyLng);
     const matchNearby = !userLocation || (hasCoords && distanceInKm(userLocation, { lat: propertyLat, lng: propertyLng }) <= 50);
-    return matchType && matchCategory && matchMapFilter && matchMapCat && matchCity && matchNearby;
-  }), [properties, filterCategory, filterType, mapFilter, mapCategory, searchCity, userLocation]);
+    return matchType && matchCategory && matchMapFilter && matchMapCat && matchState && matchCity && matchNeighborhood && matchNearby;
+  }), [properties, filterCategory, filterType, mapFilter, mapCategory, searchState, searchCity, searchNeighborhood, userLocation]);
 
   const availableCities = Array.from(new Set(properties.map(p => p.city))).sort();
+  const availableStates = Array.from(new Set(properties.map(p => p.state))).filter(Boolean);
+  const availableNeighborhoods = Array.from(new Set(properties.map(p => p.neighborhood))).filter(Boolean);
 
   const getValidCoords = useCallback(() => {
     const valid = filteredProperties.filter(p => p.latitude != null && p.longitude != null && !isNaN(Number(p.latitude)) && !isNaN(Number(p.longitude)));
@@ -331,6 +340,20 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
             </div>
           </div>
 
+          <LocationCombobox
+            value={searchState}
+            onChange={(v) => {
+              setSearchState(v);
+              setUserLocation(null);
+            }}
+            options={availableStates}
+            placeholder="Estado (ex: SP)"
+            icon={<MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+            className="bg-slate-950 rounded-xl p-2 border border-slate-800 gap-2"
+            inputClassName="bg-transparent text-white text-xs font-medium focus:outline-none flex-1 placeholder:text-slate-500"
+            ariaLabel="Filtrar por estado"
+          />
+
           <div className="flex items-center gap-2 bg-slate-950 rounded-xl p-2 border border-slate-800">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
             <select
@@ -347,6 +370,20 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
               ))}
             </select>
           </div>
+
+          <LocationCombobox
+            value={searchNeighborhood}
+            onChange={(v) => {
+              setSearchNeighborhood(v);
+              setUserLocation(null);
+            }}
+            options={availableNeighborhoods}
+            placeholder="Bairro"
+            icon={<MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+            className="bg-slate-950 rounded-xl p-2 border border-slate-800 gap-2"
+            inputClassName="bg-transparent text-white text-xs font-medium focus:outline-none flex-1 placeholder:text-slate-500"
+            ariaLabel="Filtrar por bairro"
+          />
 
           <button
             onClick={detectUserLocation}
