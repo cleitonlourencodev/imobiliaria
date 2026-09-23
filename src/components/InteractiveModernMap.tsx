@@ -362,11 +362,12 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
                 setSearchCity(e.target.value);
                 setUserLocation(null);
               }}
-              className="bg-transparent text-white text-xs font-medium focus:outline-none w-full"
+              className="bg-slate-950 text-white text-xs font-medium focus:outline-none w-full"
+              style={{ colorScheme: 'dark' }}
             >
-              <option value="todos">Todas as cidades</option>
+              <option value="todos" className="bg-slate-950 text-white">Todas as cidades</option>
               {availableCities.map(city => (
-                <option key={city} value={city}>{city}</option>
+                <option key={city} value={city} className="bg-slate-950 text-white">{city}</option>
               ))}
             </select>
           </div>

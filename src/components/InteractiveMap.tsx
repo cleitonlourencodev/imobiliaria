@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { MapPin, Navigation, Building2, Bed, Bath, Maximize, ExternalLink, X } from 'lucide-react';
+import { MapPin, Navigation, LocateFixed, Building2, Bed, Bath, Maximize, ExternalLink, X } from 'lucide-react';
 import { PropertyItem } from '@/context/RealEstateContext';
 import { formatCurrencyBRL } from '@/lib/whatsapp';
 
@@ -15,6 +15,7 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const userMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
   const leafletModuleRef = useRef<any>(null);
 
@@ -25,6 +26,41 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
       return lat != null && lng != null && !isNaN(Number(lat)) && !isNaN(Number(lng));
     });
   }, [properties]);
+
+  const handleMyLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert('Seu navegador não oferece suporte à localização.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const position: [number, number] = [coords.latitude, coords.longitude];
+        const map = mapInstanceRef.current;
+        const leaflet = leafletModuleRef.current;
+
+        if (!map || !leaflet) return;
+
+        if (userMarkerRef.current) {
+          userMarkerRef.current.setLatLng(position);
+        } else {
+          userMarkerRef.current = leaflet.circleMarker(position, {
+            radius: 9,
+            color: '#ffffff',
+            weight: 3,
+            fillColor: '#10b981',
+            fillOpacity: 1,
+          }).addTo(map);
+        }
+
+        map.flyTo(position, 14, { duration: 1.5 });
+      },
+      () => {
+        alert('Não foi possível obter sua localização. Verifique as permissões do navegador.');
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current || leafletLoadedRef.current) return;
@@ -99,6 +135,7 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
         try { mapInstanceRef.current.remove(); } catch (e) { /* ignore */ }
         mapInstanceRef.current = null;
       }
+      userMarkerRef.current = null;
       leafletLoadedRef.current = false;
       markersRef.current = [];
       if (container) {
@@ -135,8 +172,20 @@ export default function InteractiveMap({ properties }: InteractiveMapProps) {
           <span className="text-xs font-bold text-white">Mapa Interativo de Imóveis • Coordenadas Reais</span>
         </div>
 
-        <div className="bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-xl backdrop-blur-md text-[11px] text-slate-300 font-mono pointer-events-auto">
-          {properties.length} imóveis mapeados
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleMyLocation}
+            className="w-9 h-9 bg-slate-950/90 border border-slate-800 hover:border-emerald-500/60 hover:bg-emerald-500/10 rounded-xl backdrop-blur-md text-emerald-400 flex items-center justify-center transition-colors"
+            title="Ir para minha localização"
+            aria-label="Ir para minha localização"
+          >
+            <LocateFixed className="w-4 h-4" />
+          </button>
+
+          <div className="bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-xl backdrop-blur-md text-[11px] text-slate-300 font-mono">
+            {properties.length} imóveis mapeados
+          </div>
         </div>
       </div>
 
