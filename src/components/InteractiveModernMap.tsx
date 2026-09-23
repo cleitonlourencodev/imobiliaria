@@ -422,7 +422,7 @@ export default function InteractiveModernMap({ properties: propsFromParent, filt
           </div>
         </div>
 
-        <div className="relative flex-1 h-[348px] md:h-[432px] rounded-3xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
+        <div className="relative flex-none lg:flex-1 w-full min-w-0 h-[348px] md:h-[432px] rounded-3xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
           <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" />
 
         <div className="absolute top-4 left-4 z-20 pointer-events-none">

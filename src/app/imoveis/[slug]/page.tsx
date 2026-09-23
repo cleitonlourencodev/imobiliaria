@@ -178,8 +178,8 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
       {/* Breadcrumb Navigation */}
       <div className="bg-slate-900/60 border-b border-slate-800 py-3 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-2 text-slate-400">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-xs">
+          <div className="flex min-w-0 flex-1 items-center gap-2 text-slate-400 overflow-hidden">
             <Link href="/" className="hover:text-amber-400">Início</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
             <Link href="/imoveis" className="hover:text-amber-400">Imóveis</Link>
@@ -189,7 +189,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-slate-400 hover:text-white"
+            className="flex shrink-0 items-center gap-1.5 text-slate-400 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar</span>
@@ -298,7 +298,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ slug:
 
           {/* Thumbnails */}
           {property.images && property.images.length > 1 && (
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+            <div className="min-w-0 max-w-full flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
               {property.images.map((imgUrl, i) => (
                 <button
                   key={i}
